@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${videoItem != null ? videoItem.title + ' - SaTube Shorts' : 'SaTube Shorts'}">SaTube Shorts</title>
+  <link rel="stylesheet" href="/user/css/shortsVideos.css"> <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+
+</head>
+<body>
+<div class="youtube-container">
+  <header class="youtube-header">
+    <div class="header-left">
+      <button class="menu-button">
+        <i class="uil uil-bars"></i>
+      </button>
+      <a href="/" class="logo-link">
+        <img src="/user/Images/Sharif-Logo.jpg" alt="SaTube Logo" class="logo-img">
+        <span class="logo-text">DigitalHab</span>
+      </a>
+    </div>
+    <div class="header-center">
+      <form th:action="@{/search}" method="get" class="search-form">
+        <input type="search" placeholder="Search" required class="search-input" name="query" th:value="${searchQuery}">
+        <button type="submit" class="search-button">
+          <i class="uil uil-search"></i>
+        </button>
+      </form>
+      <button class="mic-button">
+        <i class="uil uil-microphone"></i>
+      </button>
+    </div>
+    <div class="header-right">
+      <button class="create-button">
+        <i class="uil uil-video"></i>
+      </button>
+      <button class="notification-button">
+        <i class="uil uil-bell"></i>
+      </button>
+      <img th:if="${loggedInUser != null}" th:src="${loggedInUser.photosImagePath != null ? loggedInUser.photosImagePath : '/user/Images/user.jpg'}" alt="User Image" class="user-avatar" onclick="toggleMenu()">
+      <img th:unless="${loggedInUser != null}" src="/user/Images/user.jpg" alt="User Image" class="user-avatar" onclick="toggleMenu()">
+
+      <div class="sub-menu-wrap" id="subMenu" th:if="${loggedInUser != null}">
+        <div class="sub-menu">
+          <div class="user-info">
+            <a th:href="@{/member/{id}(id=${loggedInUser.id})}" class="user-name">
+              <img th:src="${loggedInUser.photosImagePath}" alt="User Image">
+            </a>
+            <h3><span th:text="${loggedInUser.name}">Default Name</span></h3>
+          </div>
+          <h4 th:text="${loggedInUser.email}"></h4>
+          <hr>
+          <a th:href="@{/member/{id}/edit(id=${loggedInUser.id})}" class="sub-menu-link">
+            <i class="uil uil-user-square"></i><p>Edit Profile</p><span>></span>
+          </a>
+          <a href="/logout" class="sub-menu-link">
+            <i class="uil uil-signout"></i><p>Logout</p><span>></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout-wrapper">
+    <aside class="sidebar">
+      <ul class="sidebar-menu">
+        <li><a href="/home" class="sidebar-item"><i class="uil uil-home"></i> <span>Home</span></a></li>
+        <li><a href="/shorts" class="sidebar-item active"><i class="uil uil-fire"></i> <span>Shorts</span></a></li> <li><a href="#" class="sidebar-item"><i class="uil uil-tv-retro"></i> <span>Subscriptions</span></a></li>
+        <li class="section-separator"></li>
+        <li><a href="member-list" class="sidebar-item"><i class="uil uil-play-circle"></i> <span>Library</span></a></li>
+        <li><a href="list-video" class="sidebar-item"><i class="uil uil-history"></i> <span>History</span></a></li>
+        <li><a href="list-video" class="sidebar-item"><i class="uil uil-video"></i> <span>Your videos</span></a></li>
+        <li><a href="watch/" class="sidebar-item"><i class="uil uil-clock"></i> <span>Watch later</span></a></li>
+        <li><a href="shorts" class="sidebar-item"><i class="uil uil-thumbs-up"></i> <span>Liked videos</span></a></li>
+        <li class="section-separator"></li>
+        <span class="sidebar-title">SUBSCRIPTIONS</span>
+        <li><a href="#" class="sidebar-item"><img src="/user/Images/user.jpg" alt="Channel Icon" class="channel-icon"> <span>Rtv News</span></a></li>
+        <li><a href="#" class="sidebar-item"><img src="/user/Images/Appna.jpg" alt="Channel Icon" class="channel-icon"> <span>SEU CSE</span></a></li>
+        <li><a href="#" class="sidebar-item"><img src="/user/Images/Bangla.jpg" alt="Channel Icon" class="channel-icon"> <span>HAR PAL GEO</span></a></li>
+        <li><a href="#" class="sidebar-item"><img src="/user/Images/logo.jpg" alt="Channel Icon" class="channel-icon"> <span>Protidinerr Banglad...</span></a></li>
+        <li><a href="#" class="sidebar-item"><img src="/user/Images/Maasranga%20News.jpg" alt="Channel Icon" class="channel-icon"> <span>Devansh peole a...</span></a></li>
+        <li><a href="#" class="sidebar-item"><img src="/user/Images/Sharda.jpg" alt="Channel Icon" class="channel-icon"> <span>ISLAM ATB SHER</span></a></li>
+        <li><a href="#" class="sidebar-item"><img src="/user/Images/video.jpg" alt="Channel Icon" class="channel-icon"> <span>CodeWithHarry</span></a></li>
+        <li><a href="#" class="sidebar-item show-more"><i class="uil uil-angle-down"></i> <span>Show more</span></a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content shorts-content">
+      <div class="shorts-player-container">
+        <div class="shorts-video-wrapper">
+          <video id="shortsVideoPlayer" class="shorts-video" controls autoplay loop muted
+                 th:if="${videoItem != null and videoItem.videoUrl != null}"
+                 th:src="@{/${videoItem.videoUrl}}">
+            <source type="video/mp4" th:src="@{/${videoItem.videoUrl}}">
+          </video>
+          <!--          <div class="video-overlay-controls">-->
+          <!--            <button id="playPauseBtn" class="control-button"><i class="uil uil-pause"></i></button>-->
+          <!--            <button id="muteUnmuteBtn" class="control-button"><i class="uil uil-volume-mute"></i></button>-->
+          <!--          </div>-->
+        </div>
+
+        <div class="shorts-sidebar-right">
+          <button class="shorts-action-button more-options"><i class="uil uil-ellipsis-v"></i></button>
+
+          <div class="shorts-action-group">
+            <button class="shorts-action-button like-btn" ><i class="uil uil-thumbs-up"></i></button>
+            <span class="action-count" th:text="${videoItem != null ? videoItem.viewCount : '0'}">944K</span>
+          </div>
+          <div class="shorts-action-group">
+            <button class="shorts-action-button"><i class="uil uil-thumbs-down"></i></button>
+            <span class="action-count">Dislike</span>
+          </div>
+          <div class="shorts-action-group">
+            <button class="shorts-action-button"><i class="uil uil-comment-alt"></i></button>
+            <span class="action-count">27K</span>
+          </div>
+          <div class="shorts-action-group">
+            <button class="shorts-action-button"><i class="uil uil-share-alt"></i></button>
+            <span class="action-count">Share</span>
+          </div>
+          <div class="shorts-action-group">
+            <button class="shorts-action-button"><i class="uil uil-setting"></i></button> <span class="action-count">Remix</span>
+          </div>
+          <button class="shorts-action-button">
+            <!-- Old: thumbnailPath -->
+            <img th:if="${videoItem != null and videoItem.thumbnailUrl != null}"
+                 th:src="@{/${videoItem.thumbnailUrl}}"
+                 alt="Shorts Thumbnail" class="shorts-related-thumbnail" />
+          </button>
+        </div>
+
+        <div class="shorts-video-info">
+          <div class="shorts-channel-info">
+            <!-- Simplified to avoid referencing non-existent videoItem.uploader on ShortVideo -->
+            <img th:src="${loggedInUser != null and loggedInUser.photosImagePath != null ? loggedInUser.photosImagePath : '/user/Images/user.jpg'}" alt="Channel Icon" class="channel-avatar">
+            <span class="channel-name" th:text="${loggedInUser != null ? loggedInUser.name : 'DigitalHub User'}">DigitalHub User</span>
+            <button class="subscribe-button">Subscribe</button>
+          </div>
+          <p class="shorts-title" th:text="${videoItem != null ? videoItem.title : 'Shorts'}">Shorts</p>
+        </div>
+
+        <button class="shorts-nav-arrow arrow-up" ><i class="uil uil-angle-up"></i></button>
+        <button class="shorts-nav-arrow arrow-down"><i class="uil uil-angle-down"></i></button>
+
+      </div>
+
+      <div th:if="${videoItem == null}" class="no-video-message">
+        Video not found or unavailable.
+      </div>
+    </main>
+  </div>
+</div>
+
+<script th:src="@{/user/js/script.js}"></script>
+<script>
+  // --- Video Player Controls (Basic Example) ---
+  const shortsVideoPlayer = document.getElementById('shortsVideoPlayer');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const muteUnmuteBtn = document.getElementById('muteUnmuteBtn');
+
+  if (shortsVideoPlayer) {
+    playPauseBtn.addEventListener('click', () => {
+      if (shortsVideoPlayer.paused) {
+        shortsVideoPlayer.play();
+        playPauseBtn.querySelector('i').className = 'uil uil-pause';
+      } else {
+        shortsVideoPlayer.pause();
+        playPauseBtn.querySelector('i').className = 'uil uil-play';
+      }
+    });
+
+    muteUnmuteBtn.addEventListener('click', () => {
+      shortsVideoPlayer.muted = !shortsVideoPlayer.muted;
+      if (shortsVideoPlayer.muted) {
+        muteUnmuteBtn.querySelector('i').className = 'uil uil-volume-mute';
+      } else {
+        muteUnmuteBtn.querySelector('i').className = 'uil uil-volume';
+      }
+    });
+
+    // Auto-play and mute on load for Shorts, as per typical behavior
+    shortsVideoPlayer.play();
+    shortsVideoPlayer.muted = true;
+  }
+
+  // --- Sidebar & Dark Mode Toggles (Re-adapting existing logic) ---
+  const menuButtons = document.querySelectorAll(".menu-button");
+  const sidebar = document.querySelector(".sidebar");
+  if (menuButtons && sidebar) {
+    menuButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        document.body.classList.toggle("sidebar-collapsed");
+      });
+    });
+  }
+
+  // Avoid name collisions with global variables from other pages
+  (function(){
+    var subMenuShorts = document.getElementById("subMenu");
+    window.toggleMenu = function(){
+      if (subMenuShorts) {
+        subMenuShorts.classList.toggle("open-menu");
+      }
+    };
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${video.title} + ' - Watch Video'">Watch Video</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="user/css/watch.css">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* ... your CSS ... */
+
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f3f4f6; /* bg-gray-100 */
+      color: #1f2937; /* text-gray-900 */
+      display: flex;
+      justify-content: center;
+      align-items: flex-start; /* Align to top */
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .video-player-container {
+      background-color: white;
+      border-radius: 0.75rem; /* rounded-lg */
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-xl */
+      padding: 1.5rem; /* p-6 */
+      max-width: 900px;
+      width: 100%;
+    }
+    video {
+      width: 100%;
+      height: auto;
+      border-radius: 0.5rem; /* rounded-md */
+      background-color: black;
+      display: block; /* Remove extra space below video */
+    }
+    .video-details {
+      margin-top: 1.5rem; /* mt-6 */
+    }
+    .video-details h1 {
+      font-size: 1.875rem; /* text-3xl */
+      font-weight: 700; /* font-bold */
+      color: #1e293b; /* text-slate-800 */
+      margin-bottom: 0.75rem; /* mb-3 */
+    }
+    .video-details p {
+      font-size: 1rem; /* text-base */
+      color: #4b5563; /* text-gray-700 */
+      margin-bottom: 1rem; /* mb-4 */
+      line-height: 1.6;
+    }
+    .video-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.875rem; /* text-sm */
+      color: #6b7280; /* text-gray-500 */
+      border-top: 1px solid #e5e7eb; /* border-t border-gray-200 */
+      padding-top: 1rem; /* pt-4 */
+      margin-top: 1rem; /* mt-4 */
+    }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1.5rem;
+      color: #3b82f6; /* text-blue-500 */
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+    .back-link:hover {
+      color: #2563eb; /* text-blue-600 */
+      text-decoration: underline;
+    }
+  </style>
+  <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf}" />
+</head>
+<body>
+<div class="video-player-container">
+  <a th:href="@{/home}" class="back-link">&larr; Back to Videos</a>
+
+  <div th:if="${video != null}">
+    <video id="videoPlayer" controls th:src="@{'/' + ${video.videoPath}}" class="w-full h-auto rounded-md shadow-md"></video>
+    <div class="video-details">
+      <h1 th:text="${#strings.defaultString(video.title, 'Untitled Video')}"></h1>
+      <p th:text="${#strings.defaultString(video.description, 'No description provided.')}"></p>
+      <div class="video-meta">
+        <span th:text="${video.viewCount} + ' views'">0 views</span>
+        <span>•</span>
+        <span th:text="${video.timeAgo}">4 months ago</span>
+      </div>
+    </div>
+  </div>
+  <div th:unless="${video != null}" class="text-center py-8 text-gray-500">
+    <p>Video not found.</p>
+    <p>Please go back to the <a th:href="@{/home}" class="text-blue-500 hover:underline">video list</a>.</p>
+  </div>
+</div>
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  const videoId = /*[[${video.id != null ? video.id : ''}]]*/ '';
+  const videoPlayer = document.getElementById('videoPlayer');
+  const incrementInterval = 3; // You can change this back to 30 later if you wish
+  let lastIncrementTime = 0;
+
+  // Get CSRF token and header name if Spring Security is enabled
+  const csrfToken = document.querySelector('meta[name="_csrf"]') ? document.querySelector('meta[name="_csrf"]').getAttribute('content') : null;
+  const csrfHeader = document.querySelector('meta[name="_csrf_header"]') ? document.querySelector('meta[name="_csrf_header"]').getAttribute('content') : null;
+
+  videoPlayer.addEventListener('timeupdate', function() {
+    if (!videoPlayer.paused && !videoPlayer.ended && videoPlayer.currentTime >= (lastIncrementTime + incrementInterval)) {
+      console.log('Video played for another ' + incrementInterval + ' seconds. Incrementing view count.');
+      lastIncrementTime = Math.floor(videoPlayer.currentTime / incrementInterval) * incrementInterval;
+
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      if (csrfToken && csrfHeader) {
+        headers[csrfHeader] = csrfToken;
+      }
+
+      // Corrected fetch URL: Added leading '/'
+      fetch('/api/videos/' + videoId + '/increment-view', {
+        method: 'POST',
+        headers: headers
+      })
+              .then(response => {
+                if (response.ok) {
+                  console.log('View count incremented successfully!');
+                } else {
+                  console.error('Failed to increment view count. Status:', response.status);
+                  response.text().then(text => console.error('Response body:', text));
+                }
+              })
+              .catch(error => {
+                console.error('Error sending increment view count request:', error);
+              });
+    }
+  });
+
+  videoPlayer.addEventListener('seeking', function() {
+    if (videoPlayer.currentTime < lastIncrementTime) {
+      lastIncrementTime = Math.floor(videoPlayer.currentTime / incrementInterval) * incrementInterval;
+    }
+  });
+
+  videoPlayer.addEventListener('play', function() {
+    if (videoPlayer.currentTime < incrementInterval && lastIncrementTime !== 0) {
+      lastIncrementTime = 0;
+    }
+  });
+  /*]]>*/
+</script>
+</body>
+</html>

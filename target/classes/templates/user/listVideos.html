@@ -1,0 +1,561 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SaTube Studio - Channel Content</title>
+  <link rel="stylesheet" href="user/css/style.css">
+  <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+
+  <style>
+    /* This internal style block is mostly for quick dark mode setup or overrides. */
+    /* For a cleaner project, move most of this to style.css */
+
+    @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap');
+
+    :root {
+      --studio-bg: #1a1a1a; /* Dark background for studio */
+      --studio-sidebar-bg: #212121; /* Slightly lighter dark for sidebar */
+      --studio-card-bg: #333; /* Background for cards/elements */
+      --studio-text-light: #fff; /* Light text color */
+      --studio-text-dark: #aaa; /* Darker text for secondary info */
+      --studio-border: #444; /* Border color */
+      --studio-accent-blue: #3b82f6; /* Accent blue for active states/buttons */
+      --studio-hover-dark: #3a3a3a; /* Hover background for dark elements */
+      --studio-input-bg: #282828; /* Input background */
+    }
+
+    body {
+      font-family: "Open Sans", sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--studio-bg);
+      color: var(--studio-text-light);
+      display: flex; /* Use flex for main layout */
+      min-height: 100vh; /* Ensure it takes full viewport height */
+    }
+
+    /* General Dark Mode adjustments for SaTube elements if they are still present */
+    /* This overrides previous SaTube light theme variables */
+    body.dark-mode {
+      /* This section is simplified as the new design is primarily dark */
+      --white-color: #1a1a1a; /* Studio background */
+      --black-color: #fff;    /* Studio text light */
+      --light-white-color: #212121; /* Studio sidebar background */
+      --light-gray-color: #333; /* Studio card background */
+      --border-color: #444;   /* Studio border */
+      --primary-color: #3b82f6; /* Studio accent blue */
+      --secondary-color: #aaa; /* Studio text dark */
+      --overlay-dark-color: rgba(0, 0, 0, 0.7); /* Standard overlay */
+    }
+
+    /* Layout specific styles */
+    .studio-container {
+      display: flex;
+      width: 100%;
+    }
+
+    .studio-sidebar {
+      width: 250px; /* Fixed width for sidebar */
+      background-color: var(--studio-sidebar-bg);
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--studio-border);
+      flex-shrink: 0; /* Prevent shrinking */
+    }
+
+    .studio-sidebar-header {
+      padding: 0 20px 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: var(--studio-text-light);
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .studio-sidebar-header img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .studio-sidebar nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .studio-sidebar nav ul li a {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      color: var(--studio-text-dark);
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .studio-sidebar nav ul li a i {
+      margin-right: 15px;
+      font-size: 1.3rem;
+      color: var(--studio-text-dark); /* Default icon color */
+    }
+
+    .studio-sidebar nav ul li a.active,
+    .studio-sidebar nav ul li a:hover {
+      background-color: var(--studio-hover-dark);
+      color: var(--studio-text-light);
+    }
+    .studio-sidebar nav ul li a.active i {
+      color: var(--studio-text-light); /* Active icon color */
+    }
+
+
+    /* Main Content Area */
+    .studio-content {
+      flex-grow: 1; /* Take remaining space */
+      padding: 20px;
+      background-color: var(--studio-bg);
+      overflow-y: auto; /* Enable scrolling for content */
+    }
+
+    .studio-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .studio-header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--studio-text-light);
+    }
+
+    .studio-header .create-button {
+      background-color: var(--studio-accent-blue);
+      color: var(--studio-text-light);
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background-color 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .studio-header .create-button:hover {
+      background-color: #2563eb; /* Darker blue */
+    }
+
+    .studio-header .create-button i {
+      font-size: 1.2rem;
+    }
+
+    /* Content Navigation (Videos, Shorts, etc.) */
+    .content-nav {
+      display: flex;
+      border-bottom: 1px solid var(--studio-border);
+      margin-bottom: 20px;
+    }
+
+    .content-nav-item {
+      padding: 10px 20px;
+      color: var(--studio-text-dark);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease, border-bottom 0.2s ease;
+      border-bottom: 3px solid transparent;
+    }
+
+    .content-nav-item.active,
+    .content-nav-item:hover {
+      color: var(--studio-text-light);
+      border-bottom: 3px solid var(--studio-accent-blue);
+    }
+
+    /* Filter and Search Bar */
+    .filter-section {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+      align-items: center;
+    }
+
+    .filter-section input[type="search"] {
+      flex-grow: 1;
+      padding: 10px 15px;
+      border-radius: 5px;
+      border: 1px solid var(--studio-border);
+      background-color: var(--studio-input-bg);
+      color: var(--studio-text-light);
+      font-size: 1rem;
+      outline: none;
+    }
+    .filter-section input[type="search"]::placeholder {
+      color: var(--studio-text-dark);
+    }
+    .filter-section input[type="search"]:focus {
+      border-color: var(--studio-accent-blue);
+    }
+
+    .filter-section .filter-button {
+      background-color: var(--studio-card-bg);
+      color: var(--studio-text-light);
+      padding: 10px 15px;
+      border-radius: 5px;
+      border: 1px solid var(--studio-border);
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.95rem;
+    }
+    .filter-section .filter-button:hover {
+      background-color: var(--studio-hover-dark);
+      border-color: var(--studio-accent-blue);
+    }
+
+    /* Video Table */
+    .video-table-container {
+      background-color: var(--studio-card-bg);
+      border-radius: 8px;
+      overflow: hidden; /* For rounded corners on table */
+      border: 1px solid var(--studio-border);
+    }
+
+    .video-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .video-table thead {
+      background-color: #282828; /* Slightly different header bg */
+    }
+
+    .video-table th {
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--studio-text-dark);
+      border-bottom: 1px solid var(--studio-border);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .video-table th:first-child {
+      width: 300px; /* Adjust width for video column */
+    }
+
+    .video-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid var(--studio-border);
+      vertical-align: middle;
+      font-size: 0.9rem;
+      color: var(--studio-text-light);
+    }
+
+    .video-table tbody tr:hover {
+      background-color: var(--studio-hover-dark);
+    }
+
+    /* Video Thumbnail and Info in Table Cell */
+    .video-table .video-col {
+      display: flex;
+      align-items: flex-start; /* Align text to top of thumbnail */
+      gap: 15px;
+    }
+    .video-table .video-col .checkbox-label {
+      margin-top: 5px; /* Align checkbox with thumbnail top */
+    }
+
+    .video-table .video-thumbnail {
+      width: 120px; /* Fixed thumbnail width */
+      height: 67.5px; /* 16:9 aspect ratio */
+      object-fit: cover;
+      border-radius: 4px;
+      flex-shrink: 0; /* Prevent shrinking */
+    }
+
+    .video-table .video-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .video-table .video-title {
+      font-weight: 500;
+      color: var(--studio-text-light);
+      margin-bottom: 5px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; /* Limit to 2 lines */
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-decoration: none; /* Remove underline for link */
+    }
+    .video-table .video-title:hover {
+      color: var(--studio-accent-blue);
+    }
+
+    .video-table .video-meta {
+      font-size: 0.8rem;
+      color: var(--studio-text-dark);
+    }
+
+    /* Action Buttons in table */
+    .video-table .actions-cell {
+      display: flex;
+      gap: 8px;
+    }
+    .video-table .action-button {
+      background: none;
+      border: none;
+      color: var(--studio-text-dark);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 5px;
+      border-radius: 3px;
+      transition: color 0.2s ease, background-color 0.2s ease;
+    }
+    .video-table .action-button:hover {
+      color: var(--studio-text-light);
+      background-color: var(--studio-hover-dark);
+    }
+    .video-table .action-button.delete {
+      color: #ff6b6b; /* Red for delete */
+    }
+    .video-table .action-button.delete:hover {
+      background-color: rgba(255, 107, 107, 0.2);
+    }
+
+    /* Table Footer for Pagination */
+    .table-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 15px;
+      background-color: #282828;
+      border-top: 1px solid var(--studio-border);
+      font-size: 0.9rem;
+      color: var(--studio-text-dark);
+    }
+    .table-footer span {
+      margin-right: 15px;
+    }
+    .table-footer select {
+      background-color: var(--studio-input-bg);
+      border: 1px solid var(--studio-border);
+      color: var(--studio-text-light);
+      padding: 5px 8px;
+      border-radius: 4px;
+      margin-right: 15px;
+      outline: none;
+    }
+    .table-footer .pagination-buttons button {
+      background: none;
+      border: 1px solid var(--studio-border);
+      color: var(--studio-text-dark);
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 5px;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    .table-footer .pagination-buttons button:hover:not(:disabled) {
+      background-color: var(--studio-hover-dark);
+      color: var(--studio-text-light);
+    }
+    .table-footer .pagination-buttons button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 1024px) {
+      .studio-sidebar {
+        width: 70px; /* Collapsed sidebar */
+        padding: 10px 0;
+      }
+      .studio-sidebar-header {
+        display: none; /* Hide full header in collapsed state */
+      }
+      .studio-sidebar nav ul li a {
+        justify-content: center; /* Center icons */
+        padding: 12px 0;
+      }
+      .studio-sidebar nav ul li a span {
+        display: none; /* Hide text */
+      }
+      .studio-sidebar nav ul li a i {
+        margin-right: 0;
+      }
+      .studio-sidebar .link-section .section-title {
+        display: none; /* Hide section titles */
+      }
+      .studio-sidebar .section-separator {
+        display: none; /* Hide separators */
+      }
+    }
+    @media (max-width: 768px) {
+      .studio-container {
+        flex-direction: column;
+      }
+      .studio-sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--studio-border);
+        flex-direction: row; /* Horizontal for mobile */
+        overflow-x: auto; /* Allow scrolling for sidebar items */
+        padding: 0;
+      }
+      .studio-sidebar nav ul {
+        display: flex;
+        white-space: nowrap;
+      }
+      .studio-sidebar nav ul li a {
+        padding: 10px 15px;
+      }
+      .studio-content {
+        padding: 15px;
+      }
+      .studio-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+      .filter-section {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .filter-section .filter-button {
+        width: 100%;
+        justify-content: center;
+      }
+      .video-table-container {
+        overflow-x: auto; /* Ensure table is scrollable on small screens */
+      }
+      .video-table {
+        min-width: 700px; /* Ensure table doesn't get too small */
+      }
+    }
+
+  </style>
+</head>
+<body>
+<div class="studio-container">
+  <aside class="studio-sidebar">
+    <div class="studio-sidebar-header">
+      <img th:src="${loggedInUser != null ? (loggedInUser.photosImagePath != null ? loggedInUser.photosImagePath : 'user/Images/user.jpg') : 'user/Images/user.jpg'}" alt="User Image">
+      Your channel
+    </div>
+    <nav>
+      <ul>
+        <li><a href="/home" class="active"><i class="uil uil-home"></i> <span>Home</span></a></li>
+        <li><a href="/member-list"><i class="uil uil-play-circle"></i> <span>Content</span></a></li>
+        <li><a href="#"><i class="uil uil-analytics"></i> <span>Analytics</span></a></li>
+        <li><a href="#"><i class="uil uil-comments-alt"></i> <span>Comments</span></a></li>
+        <li><a href="#"><i class="uil uil-subtitles"></i> <span>Subtitles</span></a></li>
+        <li><a href="#"><i class="uil uil-copyright"></i> <span>Copyright</span></a></li>
+        <li><a href="#"><i class="uil uil-usd-circle"></i> <span>Earn</span></a></li>
+        <li><a href="#"><i class="uil uil-setting"></i> <span>Customization</span></a></li>
+        <li><a href="#"><i class="uil uil-music-note"></i> <span>Audio library</span></a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="studio-content">
+    <header class="studio-header">
+      <h1>Channel content</h1>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <a href="/add-video" class="create-button">
+          <i class="uil uil-plus"></i> Upload videos
+        </a>
+        <a href="/shorts/upload" class="create-button" style="background-color:#10b981;">
+          <i class="uil uil-bolt"></i> Upload short
+        </a>
+      </div>
+    </header>
+
+    <nav class="content-nav">
+      <a href="#" class="content-nav-item active">Videos</a>
+      <a href="shorts" class="content-nav-item">Shorts</a>
+      <a href="#" class="content-nav-item">Live</a>
+      <a href="#" class="content-nav-item">Posts</a>
+      <a href="#" class="content-nav-item">Playlists</a>
+      <a href="#" class="content-nav-item">Podcasts</a>
+      <a href="#" class="content-nav-item">Promotions</a>
+    </nav>
+
+    <div class="filter-section" th:action="@{/search}" th:method="post">
+      <input type="search" placeholder="Search across your channel" >
+      <button class="filter-button"><i class="uil uil-filter"></i> Filter</button>
+    </div>
+
+    <div class="video-table-container">
+      <table class="video-table">
+        <thead>
+        <tr>
+          <th style="width: 300px;">Video</th> <th>Visibility</th>
+          <th>Restrictions</th>
+          <th>Date</th>
+          <th>Views</th>
+          <th>Comments</th>
+          <th>Likes (vs. dislikes)</th>
+          <th>Actions</th> </tr>
+        </thead>
+        <tbody>
+        <tr th:each="videoItem : ${videos}" th:if="${videos != null and !videos.isEmpty()}">
+          <td class="video-col">
+            <label class="checkbox-label">
+              <input type="checkbox" class="video-select-checkbox">
+            </label>
+            <a th:if="${videoItem.id != null}" th:href="@{/watch/{id}(id=${videoItem.id})}" class="flex items-start gap-3 text-white no-underline">
+              <img th:src="${videoItem.thumbnailPath}" alt="Video Thumbnail" class="video-thumbnail">
+              <div class="video-details">
+                <div class="video-title" th:text="${#strings.defaultString(videoItem.title, 'No Title')}">Video Title</div>
+                <div class="video-meta" th:text="${#strings.defaultString(videoItem.description, 'No Description')}">Video Description goes here.</div>
+              </div>
+            </a>
+          </td>
+          <td>Public</td> <td>None</td>     <td th:text="${#temporals.format(videoItem.uploadDate, 'MMM d, yyyy')}">Jan 20, 2024</td>
+          <td th:text="${videoItem.viewCount}">100</td>
+          <td>0</td>       <td>100%</td>    <td class="actions-cell">
+          <a th:href="@{/edit/{id}(id=${videoItem.id})}" class="action-button" title="Edit video"><i class="uil uil-edit"></i></a>
+          <form th:action="@{/delete/{id}(id=${videoItem.id})}" method="GET" style="display:inline;">
+            <button type="submit" class="action-button delete" title="Delete video"><i class="uil uil-trash-alt"></i></button>
+          </form>
+          <a th:href="@{/watch/{id}(id=${videoItem.id})}" class="action-button" title="View on YouTube"><i class="uil uil-external-link-alt"></i></a>
+        </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span>Rows per page:</span>
+      <select>
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="30" selected>30</option>
+        <option value="50">50</option>
+      </select>
+      <span>1-4 of 4</span> <div class="pagination-buttons">
+      <button disabled><i class="uil uil-angle-left"></i></button>
+      <button disabled><i class="uil uil-angle-right"></i></button>
+    </div>
+    </div>
+
+    <div th:if="${videos == null or videos.isEmpty()}" class="text-gray-500 text-center py-4" style="color: var(--studio-text-dark);">No videos uploaded yet.</div>
+
+  </main>
+</div>
+
+<script th:src="@{/user/js/script.js}"></script>
+</body>
+</html>

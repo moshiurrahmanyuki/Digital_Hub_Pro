@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" class="h-full bg-gray-100">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full">
+
+<div class="min-h-full">
+  <nav class="bg-gray-800">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex h-16 items-center justify-between">
+        <div class="flex items-center">
+          <div class="shrink-0">
+            <img class="size-8" src="/user/Images/Sharif-Logo.jpg" alt="Your Company">
+          </div>
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-4">
+              <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+              <a th:href="@{/home}" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
+              <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"> </a>
+              <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"> </a>
+              <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"> </a>
+              <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"> </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <header class="bg-white shadow">
+    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <h1 class="text-3xl font-bold tracking-tight text-gray-900" th:text="${members.name}"></h1>
+    </div>
+  </header>
+  <main>
+    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+
+      <!-- Flash Message Display -->
+      <div th:if="${message}"  class="bg-green-200 border border-green-400 border-solid mb-5 p-2 rounded-md text-green-900">
+        <p th:text="${message}"></p>
+      </div>
+
+      <div class="grid grid-cols-3">
+        <div>
+          <img th:src="@{/{image}(image=${members.photosImagePath})}" id=" thumbnail" class="w-auto border p-1 rounded-md" alt="Photo preview">
+        </div>
+        <table class="table-auto w-full col-span-2">
+          <tr>
+            <th class="bg-gray-800 text-white uppercase border text-left px-6">ID</th>
+            <td class="bg-white border-b px-6 py-4 border" th:text="${members.memberId}"></td>
+          </tr>
+
+          <tr>
+            <th class="bg-gray-800 text-white uppercase border text-left px-6">Name</th>
+            <td class="bg-white border-b px-6 py-4 border" th:text="${members.name}"></td>
+          </tr>
+
+          <tr>
+            <th class="bg-gray-800 text-white uppercase border text-left px-6">Email</th>
+            <td class="bg-white border-b px-6 py-4 border" th:text="${members.email}"></td>
+          </tr>
+        </table>
+      </div>
+
+      <a th:href="@{/member/{id}/delete(id=${members.id})}" class="bg-red-600 font-medium px-3 py-2 rounded-md text-sm text-white inline-block mb-5 hover:bg-red-700 my-10">Delete</a>
+
+    </div>
+  </main>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,769 @@
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${video != null ? video.title : 'Watch Video'}">Watch Video</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!--  <link rel="stylesheet" href="user/css/watchVideo.css">-->
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Roboto', 'Inter', sans-serif;
+      background-color: #0f0f0f; /* YouTube dark background */
+      color: #f1f1f1; /* YouTube light text */
+    }
+    /* Custom scrollbar for a more integrated look */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #212121;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #4d4d4d;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    /* Style Font Awesome icons to match size */
+    .fa-solid.fa-thumbs-up, .fa-solid.fa-thumbs-down {
+      font-size: 1.25rem; /* Equivalent to h-5 w-5 */
+    }
+
+    /* Styles for related video cards within the sidebar */
+    .related-video-card {
+      display: flex;
+      gap: 0.75rem; /* gap-3 */
+      margin-bottom: 1rem; /* mb-4 */
+    }
+    .related-video-thumbnail-container {
+      flex-shrink: 0;
+      width: 168px; /* Standard YouTube related video thumbnail width */
+      aspect-ratio: 16/9;
+      border-radius: 0.5rem; /* rounded-lg */
+      overflow: hidden;
+    }
+    .related-video-thumbnail {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .related-video-info {
+      flex-grow: 1;
+    }
+    .related-video-info .title {
+      font-size: 0.95rem; /* Slightly smaller than main title */
+      font-weight: 500; /* font-medium */
+      color: #f1f1f1;
+      margin-bottom: 0.25rem;
+      line-height: 1.3;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .related-video-info .channel-name {
+      font-size: 0.8rem; /* text-xs */
+      color: #aaa;
+      margin-bottom: 0.25rem;
+    }
+    .related-video-info .meta {
+      font-size: 0.75rem; /* text-xs */
+      color: #888;
+    }
+
+    /* Reactions popup (disabled)
+    .reaction-bubble { ... }
+    .reaction-bubble.show { ... }
+    .reaction-option { ... }
+    .reaction-option:hover { background: #1f2937; }
+    */
+  </style>
+
+  <meta name="_csrf" th:content="${_csrf.token}" th:if="${_csrf}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" th:if="${_csrf}" />
+
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+
+<header class="header bg-gray-900 p-4 flex justify-between items-center rounded-lg mb-6">
+  <a th:href="@{/home}" class="text-white text-2xl font-bold">Digital Hub</a>
+  <nav class="auth-links flex items-center gap-4">
+    <div th:if="${loggedInUser == null}">
+      <a th:href="@{/login}" class="text-gray-300 hover:text-white transition-colors">Login</a>
+      <a th:href="@{/register}" class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition-colors">Register</a>
+    </div>
+    <div th:if="${loggedInUser != null}" class="flex items-center gap-4">
+      <a th:href="@{/add-video}" class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition-colors">Upload Video</a>
+      <a th:href="@{/home}" class="profile-link flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+          <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0a4.5 4.5 0 0 1 -9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1 -.437 .695A18.683 18.683 0 0 1 12 22.5c-2.786 0 -5.433 -.608 -7.812 -1.7a.75.75 0 0 1 -.437 -.695Z" clip-rule="evenodd" />
+        </svg>
+        <span th:text="${loggedInUser.name}"></span>
+      </a>
+      <a th:href="@{/logout}" class="text-gray-300 hover:text-white transition-colors">Logout</a>
+    </div>
+  </nav>
+</header>
+<div class="max-w-screen-2xl mx-auto">
+  <div class="flex flex-col lg:flex-row gap-x-6">
+
+    <div class="flex-grow lg:w-2/3">
+      <div th:if="${video != null}">
+        <div class="bg-black rounded-xl overflow-hidden aspect-video">
+          <!-- Old: th:src="@{'/' + ${video.videoPath}}" which produced a leading '//' because videoPath is already absolute -->
+          <!-- Old: class="w-full h-auto" could push native controls outside the aspect box and they get clipped by overflow-hidden -->
+          <video id="videoPlayer" controls th:src="@{${video.videoPath}}" class="w-full h-full object-contain rounded-md shadow-md" playsinline preload="metadata"></video>
+        </div>
+
+        <h1 class="text-xl md:text-2xl font-bold text-white mt-4" th:text="${video.title}"></h1>
+
+        <div class="flex flex-col md:flex-row justify-between md:items-center mt-4">
+
+
+          <div class="flex items-center gap-3 mb-4 md:mb-0">
+            <!-- Channel Avatar - Use video.member.photosImagePath if available, otherwise loggedInUser or default -->
+            <img th:src="${video.uploader != null and video.uploader.photosImagePath != null ? '/' + video.uploader.photosImagePath : '/user/Images/user.jpg'}"
+
+                 alt="Channel Avatar" class="w-10 h-10 rounded-full object-cover flex-shrink-0">
+            <div class="flex items-center gap-3 text-sm">
+              <p class="font-semibold text-white" th:text="${video.uploader != null ? video.uploader.name : (loggedInUser != null ? loggedInUser.name : 'Unknown Channel')}">Channel Name</p>
+              <!--              <p class="font-semibold text-white" th:text="${loggedInUser.name}">Channel Name</p>-->
+
+              <p class="text-xs text-gray-400" th:text="${subscriberCount != null ? subscriberCount + ' subscribers' : '0 subscribers'}">0 subscribers</p>
+            </div>
+            <!-- Subscribe Button -->
+            <button id="subscribeBtn" class="bg-white text-black font-semibold px-4 py-2 rounded-full ml-4 hover:bg-gray-200 transition-colors text-sm">Subscribe</button>
+          </div>
+
+
+
+
+
+            <div class="flex items-center gap-2">
+            <div class="flex items-center bg-gray-800 rounded-full">
+              <!-- Restored original like button design -->
+              <button id="reactLikeBtn" class="flex items-center gap-2 pl-4 pr-3 py-2 text-sm font-medium hover:bg-gray-700 rounded-l-full transition-colors">
+                <i class="fa-solid fa-thumbs-up"></i>
+                <span th:text="${video.likeCount != null ? video.likeCount : '0'}"></span>
+              </button>
+              <div class="w-px h-6 bg-gray-600"></div>
+              <button class="px-3 py-2 hover:bg-gray-700 rounded-r-full transition-colors">
+                <i class="fa-solid fa-thumbs-down"></i>
+              </button>
+            </div>
+            <button id="shareBtn" class="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gray-800 hover:bg-gray-700 rounded-full transition-colors">
+              <i class="fa-solid fa-share"></i>
+              <span>Share</span>
+            </button>
+            <button id="downloadBtn" class="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gray-800 hover:bg-gray-700 rounded-full transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+              <span>Download</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-gray-800 rounded-xl p-4 mt-4 text-sm text-gray-300">
+          <div class="font-semibold text-white flex items-center gap-2">
+            <span class="view-count-display" th:text="${video.viewCount != null ? video.viewCount + ' views' : '0 views'}">0 views</span>
+            <span class="text-gray-500">&bull;</span>
+            <span th:text="${video.uploadDate != null ? #temporals.format(video.uploadDate, 'dd MMM') : '10 Jun 2025'}">10 Jun 2025</span>
+          </div>
+          <p class="mt-2 leading-relaxed whitespace-pre-wrap" th:text="${#strings.defaultString(video.description, 'No description provided.')}"></p>
+        </div>
+
+        <div class="mt-6">
+          <h2 class="text-xl font-bold text-white mb-4 comment-section-header" th:text="${'Comments (' + (comments != null ? comments.size() : 0) + ')'}">Comments</h2>
+
+          <form id="comment-form" class="flex items-start gap-3 mb-8">
+            <div class="w-10 h-10 rounded-full bg-gray-700 flex-shrink-0">
+              <!-- Use logged in user's avatar for comment box -->
+              <img th:src="${loggedInUser != null and loggedInUser.photosImagePath != null ? '/' + loggedInUser.photosImagePath : '/user/Images/user.jpg'}" alt="User" class="w-10 h-10 rounded-full object-cover object-center">
+
+            </div>
+            <div class="w-full">
+              <textarea id="comment-textarea" class="w-full bg-transparent border-b-2 border-gray-600 focus:border-white outline-none transition pb-1" placeholder="Add a comment..."></textarea>
+              <div class="flex justify-end mt-2 gap-2">
+                <button type="button" id="cancel-comment-btn" class="text-white font-semibold px-4 py-2 rounded-full hover:bg-gray-800 transition-colors text-sm">Cancel</button>
+                <button type="submit" id="post-comment-btn" class="bg-blue-600 text-white font-semibold px-4 py-2 rounded-full hover:bg-blue-700 transition-colors text-sm disabled:bg-gray-700 disabled:cursor-not-allowed">Comment</button>
+              </div>
+            </div>
+          </form>
+
+
+          <div id="comments-list">
+            <div th:each="comment : ${comments}" th:id="'comment-' + ${comment.id}" class="comment-item flex items-start gap-4 py-4 border-b border-gray-800 last:border-b-0">
+              <div class="w-10 h-10 rounded-full bg-gray-700 flex-shrink-0">
+                <img th:src="${'/user/Images/user.jpg'}" alt="User" class="w-10 h-10 rounded-full object-cover object-center">
+
+              </div>
+              <div class="flex-grow">
+                <div class="flex items-center gap-2">
+                  <!-- Old: showed loggedInUser instead of actual comment author -->
+                  <p class="font-semibold text-white text-sm" th:text="${comment.author}"></p>
+                  <p class="text-xs text-gray-400" th:text="${#temporals.format(comment.timestamp, 'dd MMM yyyy HH:mm')}"></p>
+                </div>
+                <p class="text-gray-200 mt-1" th:text="${comment.text}"></p>
+                <div class="flex items-center gap-4 mt-2 text-gray-400">
+                  <button th:data-comment-id="${comment.id}" th:data-video-id="${video.id}" class="like-btn flex items-center gap-1 hover:text-white">
+                    <i class="fa-solid fa-thumbs-up"></i>
+                    <span class="like-count text-xs" th:text="${comment.likeCount}">0</span>
+                  </button>
+                  <button th:data-comment-id="${comment.id}" th:data-video-id="${video.id}" class="dislike-btn hover:text-white">
+                    <i class="fa-solid fa-thumbs-down"></i>
+                  </button>
+                  <button class="reply-btn text-xs font-semibold hover:text-white" th:data-comment-id="${comment.id}">Reply</button>
+                  <button class="delete-comment-btn text-xs font-semibold hover:text-red-400" th:data-comment-id="${comment.id}" th:data-video-id="${video.id}">Delete</button>
+                </div>
+                <div class="mt-3 ml-12 hidden reply-box" th:id="'reply-box-' + ${comment.id}">
+                  <textarea class="w-full bg-transparent border-b-2 border-gray-600 focus:border-white outline-none transition pb-1 reply-text" placeholder="Write a reply..."></textarea>
+                  <div class="flex justify-end mt-2 gap-2">
+                    <button type="button" class="cancel-reply text-white font-semibold px-3 py-1 rounded-full hover:bg-gray-800 transition-colors text-xs">Cancel</button>
+                    <button type="button" class="post-reply bg-blue-600 text-white font-semibold px-3 py-1 rounded-full hover:bg-blue-700 transition-colors text-xs" th:data-parent-id="${comment.id}">Reply</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div th:if="${comments == null or comments.isEmpty()}" class="text-gray-500 text-center py-4 no-comments-message">No comments yet. Be the first to comment!</div>
+          </div>
+        </div>
+      </div>
+      <div th:unless="${video != null}" class="text-center py-12 px-6 rounded-lg text-gray-400">
+        <p class="text-lg font-semibold">Video not found.</p>
+        <p class="mt-2 text-sm">The video you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+      </div>
+    </div>
+    <div class="lg:w-1/3 mt-8 lg:mt-0">
+      <h2 class="text-xl font-bold text-white mb-4">Related Videos</h2>
+      <div th:if="${relatedVideos != null and not relatedVideos.isEmpty()}">
+        <div th:each="relatedVideo : ${relatedVideos}" class="related-video-card">
+          <a th:href="@{'/watch/' + ${relatedVideo.id}}" class="related-video-thumbnail-container">
+            <!-- Use each related video's own thumbnail -->
+            <img th:src="${relatedVideo.thumbnailPath}" alt="Thumbnail" class="thumbnail">
+          </a>
+          <div class="related-video-info">
+            <a th:href="@{'/watch/' + ${relatedVideo.id}}">
+              <h3 class="title" th:text="${relatedVideo.title}">Related Video Title</h3>
+            </a>
+            <p class="channel-name" th:text="${loggedInUser.name}">Channel Name</p>
+            <div class="meta">
+              <span th:text="${relatedVideo.viewCount} + ' views'">0 views</span>
+              <span class="mx-1">&bull;</span>
+              <span th:text="${relatedVideo.timeAgo != null ? relatedVideo.timeAgo : (#temporals.format(relatedVideo.uploadDate, 'MMM dd, yyyy'))}">2 days ago</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div th:if="${relatedVideos == null or relatedVideos.isEmpty()}" class="text-gray-500 text-center py-4">
+        <p>No related videos found.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  document.addEventListener('DOMContentLoaded', () => {
+    // === Video View Increment Logic ===
+    const videoId = /*[[${video != null ? video.id : ''}]]*/ '';
+    const videoPlayer = document.getElementById('videoPlayer');
+    const incrementInterval = 3; // Keep at 3 for quick testing, change to 30 for production
+    let lastIncrementTime = 0;
+
+    const viewCountDisplay = document.querySelector('.view-count-display'); // Selector for dynamic update
+
+    // Get CSRF token and header name if Spring Security is enabled
+    const csrfToken = document.querySelector('meta[name="_csrf"]') ? document.querySelector('meta[name="_csrf"]').getAttribute('content') : null;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]') ? document.querySelector('meta[name="_csrf_header"]').getAttribute('content') : null;
+
+    if (!videoPlayer) {
+      console.error("Error: Video player element with ID 'videoPlayer' not found!");
+    } else {
+      videoPlayer.addEventListener('timeupdate', function() {
+        if (!videoPlayer.paused && !videoPlayer.ended && videoPlayer.currentTime >= (lastIncrementTime + incrementInterval)) {
+          console.log('Video played for another ' + incrementInterval + ' seconds. Triggering view increment.');
+
+          lastIncrementTime = Math.floor(videoPlayer.currentTime / incrementInterval) * incrementInterval;
+
+          const headers = {
+            'Content-Type': 'application/json'
+          };
+          if (csrfToken && csrfHeader) {
+            headers[csrfHeader] = csrfToken;
+          } else {
+            console.warn("CSRF token or header is null. Fetch request might be rejected.");
+          }
+
+          fetch('/api/videos/' + videoId + '/increment-view', {
+            method: 'POST',
+            headers: headers
+          })
+                  .then(response => {
+                    if (response.ok) {
+                      console.log('View count incremented successfully!');
+                      // Dynamically update view count on the page
+                      if (viewCountDisplay) {
+                        let currentViews = parseInt(viewCountDisplay.textContent.split(' ')[0]) || 0;
+                        viewCountDisplay.textContent = (currentViews + 1) + ' views';
+                      }
+                    } else {
+                      console.error('Failed to increment view count. Status:', response.status);
+                      response.text().then(text => console.error('Response body:', text));
+                    }
+                  })
+                  .catch(error => {
+                    console.error('Error sending increment view count request:', error);
+                  });
+        }
+      });
+
+      videoPlayer.addEventListener('seeking', function() {
+        if (videoPlayer.currentTime < lastIncrementTime) {
+          lastIncrementTime = Math.floor(videoPlayer.currentTime / incrementInterval) * incrementInterval;
+        }
+      });
+
+      videoPlayer.addEventListener('play', function() {
+        if (videoPlayer.currentTime < incrementInterval && lastIncrementTime !== 0) {
+          lastIncrementTime = 0;
+        }
+      });
+    }
+
+    // === Comment Section Logic ===
+    const commentTextarea = document.getElementById('comment-textarea');
+    const postCommentBtn = document.getElementById('post-comment-btn');
+    const cancelCommentBtn = document.getElementById('cancel-comment-btn');
+    const commentsList = document.getElementById('comments-list');
+    const commentSectionHeader = document.querySelector('.comment-section-header'); // For updating comment count
+
+    const currentVideoId = /*[[${video != null ? video.id : null}]]*/ null; // Ensure videoId is available for comments
+
+    if (postCommentBtn) {
+      postCommentBtn.disabled = true; // Disable by default
+    }
+
+    if (commentTextarea && postCommentBtn) {
+      commentTextarea.addEventListener('input', () => {
+        postCommentBtn.disabled = commentTextarea.value.trim() === '';
+      });
+    }
+
+    if (cancelCommentBtn && commentTextarea && postCommentBtn) {
+      cancelCommentBtn.addEventListener('click', () => {
+        commentTextarea.value = '';
+        postCommentBtn.disabled = true;
+      });
+    }
+
+    const commentForm = document.getElementById('comment-form');
+    if (commentForm) {
+      commentForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const commentText = commentTextarea.value.trim();
+        const authorName = "GuestUser"; // You might want to get this from a logged-in user context
+
+        if (!commentText || !currentVideoId) {
+          console.error("Comment text or video ID missing.");
+          return;
+        }
+
+        const headers = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        };
+        if (csrfToken && csrfHeader) {
+          headers[csrfHeader] = csrfToken; // Add CSRF token for security
+        }
+
+        try {
+          const response = await fetch(`/api/videos/${currentVideoId}/comments`, {
+            method: 'POST',
+            headers: headers, // Use combined headers including CSRF
+            body: JSON.stringify({ commentText, authorName })
+          });
+
+          if (response.ok) {
+            const newComment = await response.json();
+            console.log('Comment added:', newComment);
+
+            addNewCommentToDOM(newComment);
+
+            commentTextarea.value = '';
+            postCommentBtn.disabled = true;
+
+            // Update comment count displayed in the header
+            if (commentSectionHeader) {
+              let currentCount = 0;
+              const match = commentSectionHeader.textContent.match(/\((\d+)\)/);
+              if (match) {
+                currentCount = parseInt(match[1]);
+              }
+              commentSectionHeader.textContent = `Comments (${currentCount + 1})`;
+            }
+
+            const noCommentsMessage = commentsList.querySelector('.no-comments-message'); // Use the class
+            if (noCommentsMessage) {
+              noCommentsMessage.remove();
+            }
+
+            const originalText = postCommentBtn.textContent;
+            postCommentBtn.textContent = 'Posted!';
+            setTimeout(() => {
+              postCommentBtn.textContent = originalText;
+            }, 1500);
+
+          } else {
+            console.error('Failed to add comment:', response.status);
+            response.text().then(text => console.error('Response body:', text));
+          }
+        } catch (error) {
+          console.error('Error adding comment:', error);
+        }
+      });
+    }
+
+    // === Subscribe Button ===
+    const subscribeBtn = document.getElementById('subscribeBtn');
+    if (subscribeBtn) {
+      subscribeBtn.addEventListener('click', async () => {
+        const channelId = /*[[${video != null ? (video.uploaderId != null ? video.uploaderId : video.userId) : null}]]*/ null;
+        if (!channelId) return;
+        const headers = { 'Accept': 'application/json' };
+        if (csrfToken && csrfHeader) headers[csrfHeader] = csrfToken;
+        const res = await fetch(`/api/subscriptions/channels/${channelId}`, { method: 'POST', headers });
+        if (res.ok) {
+          subscribeBtn.textContent = 'Subscribed';
+        }
+      });
+    }
+
+    // === React Like ===
+    const reactLikeBtn = document.getElementById('reactLikeBtn');
+    if (reactLikeBtn && videoId) {
+      reactLikeBtn.addEventListener('click', async () => {
+        const headers = { 'Accept': 'application/json' };
+        if (csrfToken && csrfHeader) headers[csrfHeader] = csrfToken;
+        const res = await fetch(`/api/videos/${videoId}/reactions?type=LIKE`, { method: 'POST', headers });
+        if (res.ok) {
+          const counts = await res.json();
+          const span = reactLikeBtn.querySelector('span');
+          if (span && counts && counts.LIKE != null) span.textContent = counts.LIKE;
+        }
+      });
+    }
+
+    // === Download Button ===
+    const downloadBtn = document.getElementById('downloadBtn');
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', () => {
+        const a = document.createElement('a');
+        a.href = /*[[${video != null ? video.videoPath : ''}]]*/ '';
+        a.download = '';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      });
+    }
+
+    // === Share Button (Web Share API with copy fallback) ===
+    const shareBtn = document.getElementById('shareBtn');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', async () => {
+        const url = window.location.origin + '/watch/' + (videoId || '');
+        const data = { title: document.title, text: 'Check out this video on Digital Hub Pro', url };
+        if (navigator.share && navigator.canShare ? navigator.canShare(data) : !!navigator.share) {
+          try {
+            await navigator.share(data);
+          } catch (e) {
+            // user cancelled or share failed → fall back to copy
+            tryCopy(url);
+          }
+        } else {
+          tryCopy(url);
+        }
+      });
+    }
+
+    function tryCopy(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          toast('Link copied to clipboard');
+        }).catch(() => legacyCopy(text));
+      } else {
+        legacyCopy(text);
+      }
+    }
+
+    function legacyCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); toast('Link copied to clipboard'); } catch (_) { alert(text); }
+      document.body.removeChild(ta);
+    }
+
+    function toast(message) {
+      const el = document.createElement('div');
+      el.textContent = message;
+      el.style.position = 'fixed';
+      el.style.bottom = '20px';
+      el.style.left = '50%';
+      el.style.transform = 'translateX(-50%)';
+      el.style.background = '#111';
+      el.style.color = '#fff';
+      el.style.padding = '8px 12px';
+      el.style.borderRadius = '9999px';
+      el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
+      el.style.zIndex = '9999';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1600);
+    }
+
+    async function handleLikeDislike(event) {
+      const button = event.currentTarget;
+      const commentId = button.dataset.commentId;
+      const videoId = button.dataset.videoId; // This is currentVideoId from the Thymeleaf context
+      const isLike = button.classList.contains('like-btn');
+      const endpoint = isLike ?
+              `/api/videos/${videoId}/comments/${commentId}/like` :
+              `/api/videos/${videoId}/comments/${commentId}/dislike`;
+
+      const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      };
+      if (csrfToken && csrfHeader) {
+        headers[csrfHeader] = csrfToken; // Add CSRF token for security
+      }
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: headers // Use combined headers including CSRF
+        });
+
+        if (response.ok) {
+          const updatedComment = await response.json();
+          const likeCountSpan = button.querySelector('.like-count');
+          if (likeCountSpan) {
+            likeCountSpan.textContent = updatedComment.likeCount; // Update the count from the response
+          }
+          // Optionally handle dislike count update if you add a span for it
+          console.log(`Comment ${commentId} ${isLike ? 'liked' : 'disliked'}. New count: ${updatedComment.likeCount}`);
+        } else {
+          console.error(`Failed to ${isLike ? 'like' : 'dislike'} comment:`, response.status);
+          response.text().then(text => console.error('Response body:', text));
+        }
+      } catch (error) {
+        console.error(`Error ${isLike ? 'liking' : 'disliking'} comment:`, error);
+      }
+    }
+
+    function addNewCommentToDOM(comment) {
+      const commentDiv = document.createElement('div');
+      commentDiv.id = `comment-${comment.id}`;
+      commentDiv.className = 'comment-item flex items-start gap-4 py-4 border-b border-gray-800 last:border-b-0';
+
+      // Format timestamp with specific format 'dd MMM yyyy HH:mm'
+      const timestampDate = new Date(comment.timestamp);
+      const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+      const formattedTimestamp = timestampDate.toLocaleString('en-US', options).replace(/,/, ''); // Remove comma after year
+
+      commentDiv.innerHTML = `
+        <div class="w-10 h-10 rounded-full bg-gray-700 flex-shrink-0"></div>
+        <div class="flex-grow">
+          <div class="flex items-center gap-2">
+            <!-- Old used comment.authorName which is not present in Comment; using comment.author -->
+            <p class="font-semibold text-white text-sm">${comment.author}</p>
+            <p class="text-xs text-gray-400">${formattedTimestamp}</p>
+          </div>
+          <p class="text-gray-200 mt-1">${comment.text}</p>
+          <div class="flex items-center gap-4 mt-2 text-gray-400">
+            <button data-comment-id="${comment.id}" data-video-id="${currentVideoId}" class="like-btn flex items-center gap-1 hover:text-white">
+              <i class="fa-solid fa-thumbs-up"></i>
+              <span class="like-count text-xs">${comment.likeCount || 0}</span>
+            </button>
+            <button data-comment-id="${comment.id}" data-video-id="${currentVideoId}" class="dislike-btn hover:text-white">
+              <i class="fa-solid fa-thumbs-down"></i>
+            </button>
+            <button class="text-xs font-semibold hover:text-white">Reply</button>
+          </div>
+        </div>
+      `;
+      commentsList.prepend(commentDiv); // Add new comment to the top
+      addLikeDislikeEventListeners(commentDiv); // Attach listeners to the new comment
+    }
+
+    function addLikeDislikeEventListeners(container) {
+      container.querySelectorAll('.like-btn').forEach(button => {
+        button.removeEventListener('click', handleLikeDislike); // Prevent duplicate listeners
+        button.addEventListener('click', handleLikeDislike);
+      });
+      container.querySelectorAll('.dislike-btn').forEach(button => {
+        button.removeEventListener('click', handleLikeDislike); // Prevent duplicate listeners
+        button.addEventListener('click', handleLikeDislike);
+      });
+
+      // Reply box toggle
+      container.querySelectorAll('.reply-btn').forEach(button => {
+        button.addEventListener('click', () => {
+          const id = button.dataset.commentId;
+          const box = document.getElementById(`reply-box-${id}`);
+          if (box) box.classList.toggle('hidden');
+        });
+      });
+
+      // Post reply
+      container.querySelectorAll('.post-reply').forEach(button => {
+        button.addEventListener('click', async () => {
+          const parentId = button.dataset.parentId;
+          const box = document.getElementById(`reply-box-${parentId}`);
+          if (!box) return;
+          const textarea = box.querySelector('.reply-text');
+          const text = textarea.value.trim();
+          if (!text) return;
+          const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+          if (csrfToken && csrfHeader) headers[csrfHeader] = csrfToken;
+          const res = await fetch(`/api/videos/${currentVideoId}/comments`, {
+            method: 'POST', headers, body: JSON.stringify({ commentText: text, parentCommentId: parentId })
+          });
+          if (res.ok) {
+            textarea.value = '';
+            box.classList.add('hidden');
+            // Optionally fetch and render replies; for now, append below parent
+            const newComment = await res.json();
+            addNewCommentToDOM(newComment);
+          }
+        });
+      });
+
+      // Delete comment
+      container.querySelectorAll('.delete-comment-btn').forEach(button => {
+        button.addEventListener('click', async () => {
+          const commentId = button.dataset.commentId;
+          const headers = { 'Accept': 'application/json' };
+          if (csrfToken && csrfHeader) headers[csrfHeader] = csrfToken;
+          const res = await fetch(`/api/videos/${currentVideoId}/comments/${commentId}`, { method: 'DELETE', headers });
+          if (res.ok) {
+            const el = document.getElementById(`comment-${commentId}`);
+            if (el) el.remove();
+          }
+        });
+      });
+    }
+
+    addLikeDislikeEventListeners(commentsList);
+
+
+
+// Main container for related videos section
+    function filterTrulyRelatedVideosFrontend() {
+      const relatedVideosContainer = document.querySelector('.lg\\:w-1\\/3');
+      if (!relatedVideosContainer) {
+        console.warn("Related videos container not found. Cannot apply frontend filtering.");
+        return;
+      }
+
+      // Get the main video's title to use as a very basic "relevance" keyword source
+      const mainVideoTitleElement = document.querySelector('.text-xl.md\\:text-2xl.font-bold.text-white.mt-4');
+      const mainVideoTitle = mainVideoTitleElement ? mainVideoTitleElement.textContent.toLowerCase() : '';
+
+      // Extract significant keywords from the main video title (e.g., words longer than 3 characters)
+      const mainVideoKeywords = mainVideoTitle.split(/\s+/)
+              .filter(word => word.length > 3 && !['top', 'best', 'the', 'and', 'for', 'with', 'you', 'how', 'what', 'why'].includes(word)); // Basic stop words
+
+      const allRelatedVideoCards = relatedVideosContainer.querySelectorAll('.related-video-card');
+      let visibleCount = 0;
+
+      if (allRelatedVideoCards.length === 0) {
+        console.log("No related video cards found to filter.");
+        return;
+      }
+
+      console.log("Applying frontend filtering for 'truly related' videos based on keywords.");
+      console.log("Main video keywords:", mainVideoKeywords);
+
+
+      allRelatedVideoCards.forEach(card => {
+        const relatedVideoTitleElement = card.querySelector('.related-video-info .title');
+        const relatedVideoTitle = relatedVideoTitleElement ? relatedVideoTitleElement.textContent.toLowerCase() : '';
+
+        let isTrulyRelatedByFrontendLogic = false;
+
+        // Check if any of the main video's keywords are present in the related video's title
+        if (mainVideoKeywords.length > 0 && relatedVideoTitle) {
+          for (const keyword of mainVideoKeywords) {
+            if (relatedVideoTitle.includes(keyword)) {
+              isTrulyRelatedByFrontendLogic = true;
+              break; // Found a match, no need to check other keywords for this card
+            }
+          }
+        } else {
+          // If no keywords from main video, or no related video title, consider it not truly related by this logic
+          isTrulyRelatedByFrontendLogic = false;
+        }
+
+        // Show or hide the card based on the filtering result
+        if (isTrulyRelatedByFrontendLogic) {
+          card.style.display = 'flex'; // Ensure the card is visible
+          visibleCount++;
+        } else {
+          card.style.display = 'none'; // Hide the card
+        }
+      });
+
+      // Update the "No related videos found" message based on the filtering result
+      const defaultNoRelatedMessage = relatedVideosContainer.querySelector('.text-gray-500.text-center.py-4');
+      const customNoRelatedMessageClass = 'no-truly-related-message-frontend';
+      let customNoRelatedMessage = relatedVideosContainer.querySelector(`.${customNoRelatedMessageClass}`);
+
+      if (visibleCount === 0) {
+        if (defaultNoRelatedMessage) {
+          defaultNoRelatedMessage.style.display = 'none'; // Hide default message
+        }
+        if (!customNoRelatedMessage) {
+          customNoRelatedMessage = document.createElement('p');
+          customNoRelatedMessage.className = `text-gray-500 text-center py-4 ${customNoRelatedMessageClass}`;
+          relatedVideosContainer.appendChild(customNoRelatedMessage);
+        }
+        customNoRelatedMessage.textContent = "No truly related videos found by frontend filtering.";
+        customNoRelatedMessage.style.display = 'block';
+      } else {
+        if (defaultNoRelatedMessage) {
+          defaultNoRelatedMessage.style.display = 'none'; // Always hide default message if my filter ran
+        }
+        if (customNoRelatedMessage) {
+          customNoRelatedMessage.style.display = 'none'; // Hide custom message if videos are shown
+        }
+      }
+    }
+
+    // Call the frontend filtering function once the DOM is fully loaded
+    filterTrulyRelatedVideosFrontend();
+
+
+  });
+</script>
+
+</body>
+</html>
+

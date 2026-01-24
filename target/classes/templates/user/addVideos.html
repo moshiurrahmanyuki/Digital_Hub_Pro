@@ -1,0 +1,1038 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"  >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SaTube Homepage </title>
+  <link rel="stylesheet" href="user/css/style.css">
+  <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+
+
+  <style>
+
+    @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+    *{
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Open Sans", sans-serif;
+    }
+    :root{
+      --white-color: #fff;
+      --black-color: #000;
+      --light-white-color: #f0f0f0;
+      --light-gray-color: #e5e5e5;
+      --border-color: #dddddd;
+      --primary-color: #3b82f6;
+      --secondary-color: #404040;
+      --overlay-dark-color: rgba(0, 0, 0, 0.6);
+    }
+
+    body.dark-mode{
+      --white-color:#171717;
+      --black-color: #d4d4d4;
+      --light-white-color:#333;
+      --light-gray-color: #404040;
+      --border-color: #737373;
+      --secondary-color: #d4d4d4;
+    }
+    body{
+      background: var(--white-color);
+    }
+    .container{
+      display: flex;
+      flex-direction: column;
+      max-height: 100vh;
+    }
+    header, .category-list{
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--white-color);
+    }
+    .navber{
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      justify-content: center;
+    }
+    .container :where(.nav-section, .search-form, .nav-logo){
+      display: flex;
+      align-items: center;
+    }
+    .container .nav-section{
+      gap: 1rem;
+    }
+
+    .container :where(.logo-image, .user-image) {
+      width: 32px;
+      height: 32px; /* Ensure square for border-radius */
+      cursor: pointer;
+      border-radius: 50%;
+      object-fit: cover; /* Ensures image covers the circle without distortion */
+    }
+    .container .user-image {
+      margin-left: 10px; /* Space between user image and other icons */
+    }
+    .container .nav-button{
+      border: none;
+      cursor: pointer;
+      height: 40px;
+      width: 40px;
+      background-color: var(--light-gray-color);
+      margin-right: 10px;
+      border-radius: 50%;
+      background: none;
+    }
+    .container .nav-button i {
+      color: var(--black-color);
+      display: flex;
+      font-size: 1.5rem;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container .nav-button:hover{
+      background-color: var(--light-gray-color);
+    }
+
+    .container .nav-logo{
+      display: flex;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+    .container .nav-logo .logo-text{
+      font-size: 1.25rem;
+      color: var(--black-color);
+
+    }
+    .navber .nav-center{
+      display: flex;
+      gap: 0.5rem;
+      width: 100%;
+      justify-content: center;
+    }
+    .navber .search-form{
+      max-width: 550px;
+      flex: 1;
+      height: 40px;
+
+    }
+    .navber .search-form .search-input{
+      width: 100%;
+      height: 100%;
+      padding: 0 1rem;
+      outline: none;
+      font-size: 1rem;
+      color: var(--black-color);
+      background: var(--white-color);
+      border-radius: 3.1rem 0 0 3.1rem;
+      border: 1px solid var(--border-color);
+    }
+    .navber .search-form .search-input:focus{
+      border-color: var(--primary-color);
+    }
+    .navber .search-form .search-button{
+      width: auto;
+      padding: 0 1.25rem;
+      border-radius: 0 3.1rem 3.1rem 0;
+      border: var(--border-color);
+      border-left: 0;
+    }
+    .navber .nav-right .search-button{
+      display: none;
+    }
+    /* User Sub-Menu */
+    .sub-menu-wrap {
+      position: absolute;
+      top: 185%; /* Position relative to its parent nav-right */
+      right: 10px; /* Adjust as needed */
+      width: 300px; /* Slightly smaller for typical user menus */
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease-out, opacity 0.3s ease; /* Added opacity transition */
+      opacity: 0;
+      pointer-events: none; /* Disable interaction when hidden */
+      z-index: 100; /* Ensure it's above other content */
+    }
+
+    .sub-menu-wrap.open-menu {
+      max-height: 400px; /* Sufficient height to show all content */
+      opacity: 1;
+      pointer-events: auto; /* Enable interaction when open */
+    }
+
+    .sub-menu {
+      background: var(--white-color); /* Use theme color */
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      padding: 20px;
+      margin-top: 10px; /* Space from trigger */
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Soft shadow */
+    }
+    body.dark-mode .sub-menu {
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    }
+
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      padding-bottom: 15px; /* Space before HR */
+    }
+
+    .user-info h3 {
+      font-weight: 600;
+      color: var(--black-color);
+      font-size: 1.1rem;
+    }
+
+    .user-info h4 {
+      font-weight: 400; /* Slightly heavier than 300 */
+      margin: 0;
+      color: var(--white-color);
+      font-size: 0.9rem;
+    }
+
+    .user-info img {
+      width: 50px; /* Slightly smaller user image in sub-menu */
+      height: 50px;
+      border-radius: 50%;
+      margin-right: 15px;
+      object-fit: cover;
+    }
+    .user-info .user-name {
+      text-decoration: none; /* Remove underline from user name link */
+      display: flex;
+      align-items: center;
+    }
+
+
+    .sub-menu hr {
+      border: none; /* Remove default border */
+      height: 1px;
+      background: var(--light-gray-color); /* Use theme color for separator */
+      margin: 15px 0 10px;
+    }
+
+    .sub-menu-link {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--black-color); /* Use theme color for text */
+      padding: 8px 0; /* Add padding for clickable area */
+      border-radius: 0.25rem;
+      transition: background-color 0.2s ease;
+    }
+
+    .sub-menu-link p {
+      flex-grow: 1; /* Allow paragraph to take space */
+      font-size: 0.95rem;
+    }
+
+    .sub-menu-link i {
+      width: 40px;
+      height: 40px;
+      background: var(--light-white-color); /* Use theme color for icon background */
+      border-radius: 50%;
+      padding: 8px;
+      margin-right: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem; /* Adjust icon size */
+      color: var(--secondary-color); /* Icon color */
+    }
+
+    .sub-menu-link span {
+      font-size: 1.2rem; /* Adjusted arrow size */
+      transition: transform 0.3s ease;
+      color: var(--secondary-color); /* Arrow color */
+    }
+
+    .sub-menu-link:hover {
+      background-color: var(--light-gray-color);
+    }
+
+    .sub-menu-link:hover span {
+      transform: translateX(5px);
+    }
+
+    .sub-menu-link:hover p {
+      font-weight: 600;
+    }
+
+    .main-layout{
+      display: flex;
+      overflow-y: auto;
+      scrollbar-color: #a6a6a6 transparent;
+    }
+    .main-layou .sidebar{
+      width: 300px;
+      padding: 0 0.7rem 0;
+      background: var(--white-color);
+    }
+    body.sidebar-hidden .main-layout .sidebar{
+      width: 0;
+      padding: 0;
+    }
+    .main-layout .sidebar .nav-left{
+      display: none;
+      padding: 0.5rem 0.3rem;
+    }
+    .sidebar .link-container{
+      overflow-y: auto;
+      padding: 1rem 0 2rem;
+      scrollbar-width: thin;
+      height: calc(100vh - 60px);
+    }
+
+    .sidebar .link-section .link-item{
+      display: flex;
+      align-items: center;
+      font-size: 0.938rem;
+      white-space: nowrap;
+      margin-bottom: 0.25rem;
+      color: var(--black-color);
+      border-radius: 0.5rem;
+      text-decoration: none;
+    }
+
+    .sidebar .link-section .link-item:hover{
+      background: var(--light-gray-color);
+    }
+    .sidebar .link-section .link-item i {
+      font-size: 1.4rem;
+      margin-right: 0.63rem;
+    }
+    .sidebar .link-section .section-title{
+      font-size: 0.938%;
+      font-weight: 600;
+      color: var(--black-color);
+      margin: 1rem 0 0.5rem 0.5rem;
+      scrollbar-color: transparent transparent;
+    }
+    .sidebar .link-section:hover{
+      scrollbar-color: #a6a6a6 transparent;
+    }
+    .sidebar .section-separator{
+      height: 1px;
+      margin: 0.625rem 0;
+      background: var(--light-gray-color);
+    }
+    .main-layout .content-wrapper{
+      padding: 0 1rem;
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    /* New styles for Video Upload Form and Video List */
+
+    /* Video Upload Form Styles */
+    .upload-form-container {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 30px;
+      background: var(--white-color);
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border-color);
+    }
+
+    .form-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .form-title {
+      font-size: 2.2rem;
+      color: var(--black-color);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .form-description {
+      font-size: 1.1rem;
+      color: var(--secondary-color);
+      line-height: 1.6;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--black-color);
+      margin-bottom: 8px;
+    }
+
+    .form-control, .form-textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      color: var(--black-color);
+      background-color: var(--light-white-color);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+    body.dark-mode .form-control, body.dark-mode .form-textarea {
+      background-color: #333;
+      border-color: #737373;
+    }
+
+
+    .form-control:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    }
+
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .form-file-upload {
+      border: 2px dashed var(--border-color);
+      border-radius: 8px;
+      padding: 30px;
+      text-align: center;
+      cursor: pointer;
+      background-color: var(--light-white-color);
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    body.dark-mode .form-file-upload {
+      background-color: #333;
+      border-color: #737373;
+    }
+
+
+    .form-file-upload:hover {
+      border-color: var(--primary-color);
+      background-color: var(--light-gray-color);
+    }
+    body.dark-mode .form-file-upload:hover {
+      background-color: #404040;
+    }
+
+
+    .form-file-upload-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .form-file-upload svg {
+      margin-bottom: 10px;
+      color: var(--secondary-color); /* Icon color */
+    }
+
+    .form-file-upload-text {
+      font-size: 1rem;
+      color: var(--secondary-color);
+      display: block;
+    }
+
+    .submit-button {
+      width: 100%;
+      padding: 15px;
+      background-color: var(--primary-color);
+      color: var(--white-color);
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    .submit-button:hover {
+      background-color: #2563eb; /* Darker blue on hover */
+      transform: translateY(-2px);
+    }
+
+    .submit-button:active {
+      transform: translateY(0);
+    }
+
+    .form-message {
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .form-message.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    body.dark-mode .form-message.success {
+      background-color: #1c4a2a;
+      color: #98e0a3;
+      border-color: #326b42;
+    }
+
+    .form-message.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    body.dark-mode .form-message.error {
+      background-color: #6a1a27;
+      color: #f1aeb5;
+      border-color: #8c2e3a;
+    }
+
+    /* Preview Styles */
+    #thumbnail-preview, #video-preview {
+      margin-top: 25px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 15px;
+      background-color: var(--light-white-color);
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+    }
+    body.dark-mode #thumbnail-preview, body.dark-mode #video-preview {
+      background-color: #333;
+      border-color: #737373;
+    }
+
+
+    #uploaded-thumbnail {
+      width: 100%;
+      height: 200px;
+      object-fit: contain;
+      border-radius: 6px;
+      background-color: #f0f0f0; /* Default background for empty preview */
+      display: block;
+    }
+    body.dark-mode #uploaded-thumbnail {
+      background-color: #404040;
+    }
+
+
+    #uploaded-video {
+      width: 100%;
+      max-height: 400px;
+      border-radius: 6px;
+      background-color: #000;
+      display: block;
+    }
+
+    /* Custom Styles for Video List (from HTML) */
+    .video-list-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .video-list-container h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 2.5rem;
+      color: var(--primary-color);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .mb-6 {
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .mb-6 a {
+      padding: 0.6rem 1.2rem;
+      background-color: var(--light-gray-color);
+      color: var(--black-color);
+      border-radius: 0.5rem;
+      font-weight: 600;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .mb-6 a:hover {
+      background-color: var(--border-color);
+      transform: translateY(-2px);
+    }
+    body.dark-mode .mb-6 a {
+      background-color: #404040;
+      color: #d4d4d4;
+    }
+    body.dark-mode .mb-6 a:hover {
+      background-color: #555;
+    }
+
+
+    .delete-form {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0.8rem 0.8rem 1rem;
+      background: var(--white-color);
+      border-radius: 0 0 0.75rem 0.75rem;
+    }
+    body.dark-mode .delete-form {
+      background: #171717;
+    }
+
+    .delete-button {
+      padding: 0.4rem 0.8rem;
+      background-color: #dc3545; /* Standard red for delete */
+      color: var(--white-color);
+      border: none;
+      border-radius: 0.4rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    .delete-button:hover {
+      background-color: #c82333;
+      transform: translateY(-1px);
+    }
+
+    .delete-button:active {
+      transform: translateY(0);
+    }
+
+    .text-gray-500 {
+      color: var(--secondary-color);
+      font-style: italic;
+      margin-top: 40px;
+    }
+    .text-center {
+      text-align: center;
+    }
+    .py-4 {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+
+
+    /* Add Responsive Media Queries */
+    @media (max-width: 1400px) {
+      .content-wrapper .video-list {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .content-wrapper .video-list {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .content-wrapper .video-list {
+        grid-template-columns: 1fr;
+      }
+      /* ... other existing 768px rules ... */
+    }
+
+
+
+    @media (max-width: 768px){
+      .navber .nav-center{
+        display: none;
+      }
+      .navber .nav-right .search-button{
+        display: block;
+      }
+      .main-layout .screen-overlay{
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 15;
+        background: var(--overlay-dark-color);
+      }
+      body.sidebar-hidden .main-layout .screen-overlay{
+        opacity: 0;
+        pointer-events: none;
+      }
+      .main-layout .sidebar{
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 20;
+        height: 100vh;
+      }
+      body.sidebar-hidden .main-layout .sidebar{
+        left: -280px;
+      }
+      .main-layout .sidebar .nav-left{
+        display: flex;
+      }
+    }
+
+  </style>
+</head>
+<body class="sidebar-hidden">
+<div class="container">
+  <!-- Header Navber -->
+  <header>
+    <nav class="navber">
+      <div class="nav-section nav-left">
+        <button class="nav-button menu-button">
+          <i class="uil uil-bars"></i>
+        </button>
+        <a href="user/Images/Sharif-Logo.jpg" class="nav-logo">
+          <img src="user/Images/Sharif-Logo.jpg" alt="Logo" class="logo-image">
+          <h2 class="logo-text">SaTube</h2>
+        </a>
+      </div>
+      <div class="nav-section nav-center">
+        <form th:action="@{/search}" class="search-form" method="get">
+          <input type="search" placeholder="Search" required
+                 class="search-input" name="query" id="search" th:value="${searchQuery}">
+          <button class="nav-button search-button">
+            <i class="uil uil-search"></i>
+          </button>
+        </form>
+        <button class="nav-button mic-button">
+          <i class="uil uil-microphone"></i>
+        </button>
+      </div>
+      <div class="nav-section nav-right">
+        <button class="nav-button search-button">
+          <i class="uil uil-search"></i>
+        </button>
+        <button class="nav-button theme-button">
+          <i class="uil uil-moon"></i>
+        </button>
+        <img th:if="${loggedInUser != null}" th:src="${loggedInUser.photosImagePath != null ? loggedInUser.photosImagePath : 'user/Images/user.jpg'}" alt="User Image" class="user-image" onclick="toggleMenu()">
+
+        <!--                   <img th:src="${loggedInUser.photosImagePath != null ? loggedInUser.photosImagePath : 'user/Images/user.jpg'}" alt="User Image" class="user-image" onclick="toggleMenu()">-->
+        <img th:unless="${loggedInUser != null}" src="user/Images/user.jpg" alt="User Image" class="user-image" onclick="toggleMenu()">
+
+        <div class="sub-menu-wrap" id="subMenu" th:if="${loggedInUser != null}">
+          <div class="sub-menu">
+            <div  class="user-info ">
+              <a th:href="@{member/{id}(id=${loggedInUser.id})}" class="user-name">
+                <img th:src="${loggedInUser.photosImagePath}" alt="User Image" class="user-image"> </a>
+              <h3 th:text="${loggedInUser.name}">Default Name</h3>
+            </div>
+            <h4 th:text="${loggedInUser.email}" ></h4>
+            <hr>
+
+            <a href="#" class="sub-menu-link">
+              <i class="uil uil-google"></i>
+              <p>Google Account </p>
+              <span>></span>
+            </a>
+
+            <a  th:href="@{/member/{id}/edit(id=${loggedInUser.id})}" class="sub-menu-link" >
+              <i class="uil uil-user-square"></i>
+              <p>Edit Profile</p>
+              <span>></span>
+            </a>
+
+            <a href="#" class="sub-menu-link">
+              <i class="uil uil-setting"></i>
+              <p>Settings & Privacy</p>
+              <span>></span>
+            </a>
+
+            <a href="/logout" class="sub-menu-link">
+              <i class="uil uil-signout"></i>
+              <p>Logout</p>
+              <span>></span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+
+    </nav>
+  </header>
+
+  <main class="main-layout">
+
+    <div class="screen-overlay">
+
+    </div>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+      <div class="nav-section nav-left">
+        <button class="nav-button menu-button">
+          <i class="uil uil-bars"></i>
+        </button>
+        <a href="#" class="nav-logo">
+          <img src="user/Images/Sharif-Logo.jpg" alt="Logo" class="logo-image">
+          <h2 class="logo-text">CnTube</h2>
+        </a>
+      </div>
+
+
+      <div class="link-container">
+        <div class="link-section">
+          <a href="/home" class="link-item">
+            <i class="uil uil-estate"></i>Home
+          </a>
+          <a href="/shorts" class="link-item">
+            <i class="uil uil-video"></i>Shots
+          </a>
+          <a href="#" class="link-item">
+            <i class="uil uil-tv-retro"></i>Subscription
+          </a>
+        </div>
+        <div class="section-separator"></div>
+
+        <div class="link-section">
+          <h4 class="section-title">You</h4>
+          <a href="/list-video" class="link-item">
+            <i class="uil uil-user-square"></i>Your Channel
+          </a>
+          <a href="#" class="link-item">
+            <i class="uil uil-history"></i>History
+          </a>
+          <a href="#" class="link-item">
+            <i class="uil uil-clock"></i>Watch later
+          </a>
+        </div>
+        <div class="section-separator"></div>
+
+        <div class="link-section">
+          <h4 class="section-title">Explore</h4>
+          <a href="#" class="link-item">
+            <i class="uil uil-fire"></i>Trending
+          </a>
+          <a href="#" class="link-item">
+            <i class="uil uil-music"></i>Music
+          </a>
+          <a href="#" class="link-item">
+            <i class="uil uil-basketball"></i>Gaming
+          </a>
+          <a href="#" class="link-item">
+            <i class="uil uil-trophy"></i>Sports
+          </a>
+        </div>
+        <div class="section-separator"></div>
+
+        <div class="link-section">
+          <h4 class="section-title">More From Youtube</h4>
+          <a href="#" class="link-item">
+            <i class="uil uil-shield-plus"></i>Youtube Plus
+          </a>
+          <a href="#" class="link-item">
+            <i class="uil uil-headphones-alt"></i>Youtube Music
+          </a>
+          <a href="#" class="link-item">
+            <i class="uil uil-basketball"></i>Gaming
+          </a>
+        </div>
+        <div class="section-separator"></div>
+
+        <div class="link-section">
+          <a href="#" class="link-item">
+            <i class="uil uil-setting"></i>Setting
+          </a>
+          <a href="#" class="link-item">
+            <i class="uil uil-file-medical-alt"></i>Report
+          </a>
+          <a href="#" class="link-item">
+            <i class="uil uil-question-circle"></i>Help
+          </a>
+          <a href="#" class="link-item">
+            <i class="uil uil-exclamation-triangle"></i>feedback
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <div class="content-wrapper">
+      <div class="container mx-auto p-4">
+        <div class="upload-form-container">
+          <div class="form-header">
+            <h2 class="form-title">Upload Your Video</h2>
+            <p class="form-description">
+              Share your video with our community. Please fill in the details below.
+            </p>
+          </div>
+          <form id="video-upload-form" th:action="@{/upload}" th:object="${video}" method="post"
+                enctype="multipart/form-data">
+            <div class="form-group">
+              <label for="title" class="form-label">Video Title</label>
+              <input type="text" id="title" th:field="*{title}" class="form-control"
+                     placeholder="Enter video title" required>
+              <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}"
+                   class="mt-2 text-xs text-red-500"></div>
+            </div>
+
+            <div class="form-group">
+              <label for="description" class="form-label">Description</label>
+              <textarea id="description" th:field="*{description}" class="form-textarea"
+                        placeholder="Enter video description" required></textarea>
+              <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}"
+                   class="mt-2 text-xs text-red-500"></div>
+            </div>
+
+            <div class="form-group">
+              <label for="fileImage" class="form-label">Thumbnail Image</label>
+              <input type="file" id="fileImage" name="thumbnailFile" accept="image/*"
+                     class="form-control" onchange="previewThumbnail(event)">
+              <p id="image-error" class="mt-2 text-xs text-red-500"></p>
+            </div>
+
+            <div class="form-group">
+              <label for="fileVideo" class="form-label">Video File</label>
+              <div id="video-file-upload" class="form-file-upload">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 0115.9 6L16 6a3 3 0 013 3v10a2 2 0 01-2 2H7a2 2 0 01-2-2v-1a1 1 0 011-1h1zm5-7a1 1 0 00-1 1v3.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L13 10.586V9a1 1 0 00-1-1z"/>
+                </svg>
+                <span class="form-file-upload-text" id="file-upload-text">Drag and drop your video here, or click to select a file</span>
+                <input type="file" id="fileVideo" name="videoFile" accept="video/*"
+                       class="form-file-upload-input" required onchange="previewVideo(event)">
+              </div>
+              <p id="file-error" class="mt-2 text-xs text-red-500"></p>
+              <div th:if="${#fields.hasErrors('videoPath')}" th:errors="*{videoPath}"
+                   class="mt-2 text-xs text-red-500"></div>
+            </div>
+
+            <!--                        <div class="form-group">-->
+            <!--                            <label for="duration" class="form-label">Duration</label>-->
+            <!--                            <input type="text" id="duration" th:value="${video.durationSeconds}" class="form-control">-->
+            <!--                             <div th:if="${#fields.hasErrors('durationSeconds')}" th:errors="*{durationSeconds}"-->
+            <!--                                 class="mt-2 text-xs text-red-500"></div>-->
+            <!--                        </div>-->
+
+
+            <!-- Video Duration -->
+            <div class="form-group">
+              <label for="duration" class="form-label">
+                Duration <span>*</span>
+              </label>
+              <input type="text" id="duration" th:field="*{duration}" class="form-control"
+                     placeholder="Enter video duration (e.g., 5:30)" required>
+              <div th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}"
+                   class="mt-1 text-sm text-danger"></div>
+            </div>
+
+            <div class="form-group" id="thumbnail-preview" style="display: none;">
+              <label class="form-label">Thumbnail Preview</label>
+              <img id="uploaded-thumbnail" src="" alt="Thumbnail Preview"
+                   class="w-full h-48 object-cover rounded-md shadow-md">
+            </div>
+
+            <div class="form-group" id="video-preview" style="display: none;">
+              <label class="form-label">Video Preview</label>
+              <video id="uploaded-video" controls class="w-full h-auto rounded-md shadow-md"></video>
+            </div>
+
+            <div class="form-group">
+              <button type="submit" class="submit-button" id="upload-button">Upload Video</button>
+            </div>
+
+            <div id="form-message" class="form-message" th:if="${message != null}"
+                 th:classappend="${message.type == 'success' ? 'success' : 'error'}">
+              <span th:text="${message.text}"></span>
+            </div>
+          </form>
+        </div>
+
+
+
+      </div>
+    </div>
+  </main>
+</div>
+
+
+
+<script >
+
+  const mamuButton = document.querySelectorAll(".menu-button");
+  const screenOverlay = document.querySelector(".screen-overlay");
+  const themeButton  = document.querySelector(".theme-button i");
+
+  if(localStorage.getItem("darkMode") === "enabled"){
+    document.body.classList.add("dark-mode");
+    themeButton.classList.replace("uil-moon", "uil-sun");
+  }else{
+    themeButton.classList.replace("uil-sun", "uil-moon");
+  }
+
+  themeButton.addEventListener("click", () =>{
+    const isDarkMode = document.body.classList.toggle("dark-mode");
+    localStorage.setItem("darkMode",isDarkMode ? "enabled" : "desabled");
+    themeButton.classList.toggle("uil-sun", isDarkMode);
+    themeButton.classList.toggle("uil-moon", !isDarkMode);
+  });
+
+
+  mamuButton.forEach(button => {
+    button.addEventListener("click" , () => {
+      document.body.classList.toggle("sidebar-hidden");
+      console.log("Click Button!")
+    });
+  });
+
+  screenOverlay.addEventListener("click" , () =>{
+    document.body.classList.toggle("sidebar-hidden");
+
+  });
+  if(window.innerWidth >= 768){
+    document.body.classList.remove("sidebar-hidden");
+  }
+
+  let subMenu = document.getElementById("subMenu"); // This variable will be null if the element isn't in HTML
+  function toggleMenu(){
+    subMenu.classList.toggle("open-menu");
+  }
+
+
+
+  const videoListContainer = document.querySelector('.video-list');
+
+
+  function shuffleVideos() {
+    if (!videoListContainer) {
+      console.warn("Video list container (.video-list) not found. Cannot shuffle videos.");
+      return; // Exit the function if the container is not found
+    }
+
+    const videoCards = Array.from(videoListContainer.children);
+
+    for (let i = videoCards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+
+
+      [videoCards[i], videoCards[j]] = [videoCards[j], videoCards[i]];
+    }
+
+    videoCards.forEach(card => videoListContainer.appendChild(card));
+
+    console.log("Videos shuffled on page load!");
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    shuffleVideos();
+  });
+</script>
+
+</body>
+</html>
+

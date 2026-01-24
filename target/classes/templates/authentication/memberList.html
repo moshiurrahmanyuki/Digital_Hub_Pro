@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" class="h-full bg-gray-100">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full">
+
+<div class="min-h-full">
+  <nav class="bg-gray-800">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex h-16 items-center justify-between">
+        <div class="flex items-center">
+          <div class="shrink-0">
+            <img class="size-8" src="/user/Images/Sharif-Logo.jpg" alt="Your Company">
+          </div>
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-4">
+              <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+              <a th:href="@{/home}" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
+              <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"> </a>
+              <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"> </a>
+              <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"> </a>
+              <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"> </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <header class="bg-white shadow">
+    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <h1 class="text-3xl font-bold tracking-tight text-gray-900">List of Members</h1>
+    </div>
+  </header>
+  <main>
+    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+
+      <!-- Flash Message Display -->
+      <div th:if="${message}"  class="bg-green-200 border border-green-400 border-solid mb-5 p-2 rounded-md text-green-900">
+        <p th:text="${message}"></p>
+      </div>
+
+      <a th:href="@{'/register'}" class="bg-blue-600 font-medium px-3 py-2 rounded-md text-sm text-white inline-block mb-5 hover:bg-blue-700"> Add New</a>
+      <table class="table-auto w-full">
+        <thead class="bg-gray-800 text-white uppercase">
+        <tr>
+          <th class="px-6 py-3 text-center">ID</th>
+          <th class="px-6 py-3 text-center">Photo</th>
+          <th class="px-6 py-3 text-center"> Name</th>
+          <th class="px-6 py-3 text-center">Email</th>
+          <!--          <th class="px-6 py-3 text-center">Password</th>-->
+<!--          <th class="px-6 py-3 text-center">Confirm Password</th>-->
+          <th class="px-6 py-3 text-center">&nbsp;</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr class="bg-white bg-white dark:bg-gray-800 dark:border-gray-700" th:each="member: ${memberList}">
+          <td class="px-6 py-4 text-center" th:text="${member.memberId}"></td>
+          <td class="px-6 py-4 text-center">
+            <img th:src="@{${member.photosImagePath}}" id=" thumbnail" class="h-16 w-auto border p-1 rounded-md" alt="Photo preview">
+          </td>
+          <td class="text-white px-6 py-4 text-center" th:text="${member.name}"></td>
+          <td class="text-white px-6 py-4 text-center" th:text="${member.email}"></td>
+          <!--          <td class="px-6 py-4 text-center" th:text="${member.password}"></td>-->
+<!--          <td class="px-6 py-4 text-center" th:text="${member.confirmPassword}"></td>-->
+          <td class="px-6 py-4 text-center">
+            <a th:href="@{/member/{id}(id=${member.id})}" class="bg-green-600 font-medium hover:bg-green-700 px-3 py-2 rounded-md text-sm text-white">View</a>
+            <a th:href="@{/member/{id}/edit(id=${member.id})}" class="bg-blue-600 font-medium hover:bg-blue-700 px-3 py-2 rounded-md text-sm text-white">Edit</a>
+            <a th:href="@{/member/{id}/delete(id=${member.id})}" class="bg-red-600 font-medium hover:bg-red-700 px-3 py-2 rounded-md text-sm text-white">Delete</a></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+
+</body>
+</html>

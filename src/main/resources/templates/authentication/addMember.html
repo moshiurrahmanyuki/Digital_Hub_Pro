@@ -1,0 +1,671 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--  <meta charset="UTF-8">-->
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--  <title>Create Account</title>-->
+<!--  <link rel="preconnect" href="https://fonts.googleapis.com">-->
+<!--  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>-->
+<!--  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">-->
+<!--  <script src="https://cdn.tailwindcss.com"></script>-->
+<!--  <link rel="stylesheet" href="authentication/registration.css">-->
+<!--  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />-->
+
+<!--  <style>-->
+<!--    body {-->
+<!--      font-family: 'Inter', sans-serif;-->
+<!--      background-color: #f3f4f6;-->
+<!--      display: flex;-->
+<!--      justify-content: center;-->
+<!--      align-items: center;-->
+<!--      min-height: 100vh;-->
+<!--      margin: 0;-->
+<!--      overflow-x: hidden; /* Prevent horizontal scrollbar */-->
+<!--    }-->
+
+<!--    .registration-container {-->
+<!--      background-color: #ffffff;-->
+<!--      border-radius: 0.75rem;-->
+<!--      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);-->
+<!--      display: flex;-->
+<!--      height: auto;-->
+<!--      max-width: 800px;-->
+<!--      width: 100%;-->
+<!--      overflow: hidden;-->
+<!--    }-->
+
+<!--    .registration-container:hover {-->
+<!--      transform: translateY(-0.5rem);-->
+<!--      box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.15), 0 3px 4px -1px rgba(0, 0, 0, 0.08);-->
+<!--    }-->
+
+<!--    .registration-image-side {-->
+<!--      background-image: url('https://images.unsplash.com/photo-1544716278-ca5e3f165249?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80'); /* Replace with your image URL */-->
+<!--      background-size: cover;-->
+<!--      background-position: center;-->
+<!--      width: 40%;-->
+<!--      display: flex;-->
+<!--      justify-content: center;-->
+<!--      align-items: center;-->
+<!--      color: #ffffff;-->
+<!--      text-align: center;-->
+<!--      overflow: hidden;-->
+<!--    }-->
+
+<!--    .registration-image-side:hover {-->
+<!--      width: 45%;-->
+<!--    }-->
+
+<!--    .registration-image-overlay {-->
+<!--      background-color: rgba(0, 0, 0, 0.5); /* Slightly darker overlay */-->
+<!--      width: 100%;-->
+<!--      height: 100%;-->
+<!--      display: flex;-->
+<!--      flex-direction: column;-->
+<!--      justify-content: center;-->
+<!--      align-items: center;-->
+<!--      padding: 2rem;-->
+<!--    }-->
+
+<!--    .registration-image-title {-->
+<!--      font-size: 2.2rem;-->
+<!--      font-weight: 700;-->
+<!--      margin-bottom: 1rem;-->
+<!--      color: #f5f5f5;-->
+<!--      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);-->
+<!--    }-->
+
+<!--    .registration-image-subtitle {-->
+<!--      font-size: 1.2rem;-->
+<!--      color: #e0e0e0;-->
+<!--      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);-->
+<!--    }-->
+
+
+<!--    .registration-form-side {-->
+<!--      padding: 2.5rem;-->
+<!--      width: 60%;-->
+<!--      display: flex;-->
+<!--      flex-direction: column;-->
+<!--      justify-content: center;-->
+<!--    }-->
+
+
+<!--    .form-title {-->
+<!--      font-size: 2rem;-->
+<!--      font-weight: 700;-->
+<!--      color: #2c3e50;-->
+<!--      margin-bottom: 2rem;-->
+<!--      text-align: left;-->
+<!--      border-bottom: 2px solid #ecf0f1;-->
+<!--      padding-bottom: 1rem;-->
+<!--    }-->
+
+<!--    .form-title:hover {-->
+<!--      border-bottom-color: #3498db;-->
+<!--    }-->
+
+<!--    .form-group {-->
+<!--      margin-bottom: 1.5rem;-->
+<!--    }-->
+
+<!--    .label {-->
+<!--      display: block;-->
+<!--      font-size: 1.1rem;-->
+<!--      font-weight: 600;-->
+<!--      color: #34495e;-->
+<!--      margin-bottom: 0.75rem;-->
+<!--    }-->
+
+<!--    .label:hover {-->
+<!--      color: #2c3e50;-->
+<!--    }-->
+
+<!--    .input {-->
+<!--      width: 100%;-->
+<!--      padding: 0.8rem;-->
+<!--      border-radius: 0.5rem;-->
+<!--      border: 1px solid #bdc3c7;-->
+<!--      font-size: 1rem;-->
+<!--      color: #2c3e50;-->
+<!--      transition: border-color 0.2s ease, box-shadow 0.2s ease;-->
+<!--      background-color: #f9f9f9;-->
+<!--    }-->
+
+<!--    .input:focus {-->
+<!--      outline: none;-->
+<!--      border-color: #3498db;-->
+<!--      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);-->
+<!--    }-->
+
+<!--    .input:hover {-->
+<!--      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);-->
+<!--    }-->
+
+<!--    .error-message {-->
+<!--      color: #e74c3c;-->
+<!--      font-size: 0.9rem;-->
+<!--      margin-top: 0.5rem;-->
+<!--      opacity: 0;-->
+<!--    }-->
+
+<!--    .form-group.error .error-message {-->
+<!--      opacity: 1;-->
+<!--    }-->
+
+<!--    .button {-->
+<!--      width: 100%;-->
+<!--      padding: 0.8rem;-->
+<!--      border-radius: 0.5rem;-->
+<!--      font-size: 1.1rem;-->
+<!--      font-weight: 600;-->
+<!--      color: #ffffff;-->
+<!--      background-color: #3498db;-->
+<!--      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;-->
+<!--      cursor: pointer;-->
+<!--      border: none;-->
+<!--      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);-->
+<!--      position: relative;-->
+<!--      overflow: hidden;-->
+<!--    }-->
+
+<!--    .button:hover {-->
+<!--      background-color: #2980b9;-->
+<!--      transform: translateY(-2px);-->
+<!--      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);-->
+<!--    }-->
+
+<!--    .button:active {-->
+<!--      transform: translateY(0);-->
+<!--      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);-->
+<!--    }-->
+
+<!--    .button::after {-->
+<!--      content: "";-->
+<!--      position: absolute;-->
+<!--      top: 50%;-->
+<!--      left: 50%;-->
+<!--      width: 5px;-->
+<!--      height: 5px;-->
+<!--      background: rgba(255, 255, 255, 0.5);-->
+<!--      border-radius: 100%;-->
+<!--      transform: translate(-50%, -50%) scale(0);-->
+<!--      opacity: 0;-->
+<!--      transition: transform 0.5s ease, opacity 0.5s ease;-->
+<!--    }-->
+
+<!--    .button:active::after {-->
+<!--      transform: translate(-50%, -50%) scale(100);-->
+<!--      opacity: 1;-->
+<!--    }-->
+
+<!--    .link-container {-->
+<!--      margin-top: 1.5rem;-->
+<!--      font-size: 1rem;-->
+<!--      color: #555555;-->
+<!--      text-align: center;-->
+<!--      opacity: 1;-->
+<!--    }-->
+
+
+<!--    .link {-->
+<!--      color: #3498db;-->
+<!--      text-decoration: none;-->
+<!--      font-weight: 600;-->
+<!--      transition: color 0.2s ease, text-decoration 0.2s ease;-->
+<!--    }-->
+
+<!--    .link:hover {-->
+<!--      color: #2980b9;-->
+<!--      text-decoration: underline;-->
+<!--    }-->
+
+<!--    /* Responsive adjustments for smaller screens */-->
+<!--    @media (max-width: 768px) {-->
+<!--      .registration-container {-->
+<!--        flex-direction: column;-->
+<!--        width: 95%;-->
+<!--        margin: 1rem auto;-->
+<!--        overflow-y: auto;-->
+<!--        max-height: 100vh;-->
+<!--      }-->
+<!--      .registration-image-side {-->
+<!--        width: 100%;-->
+<!--        height: auto;-->
+<!--        max-height: 300px;-->
+<!--      }-->
+<!--      .registration-form-side {-->
+<!--        width: 100%;-->
+<!--        padding: 2rem;-->
+<!--      }-->
+<!--      .registration-image-overlay {-->
+<!--        padding: 1rem;-->
+<!--      }-->
+<!--      .registration-image-title {-->
+<!--        font-size: 1.8rem;-->
+<!--      }-->
+<!--      .registration-image-subtitle {-->
+<!--        font-size: 1rem;-->
+<!--      }-->
+<!--    }-->
+<!--  </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="registration-container">-->
+<!--  <div class="registration-image-side">-->
+<!--    <div class="registration-image-overlay">-->
+<!--      <h2 class="registration-image-title">Join Our Hub Community</h2>-->
+<!--      <p class="registration-image-subtitle">Discover a world of knowledge and stories.</p>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--  <div class="registration-form-side">-->
+<!--    <h2 th:text="${title}">Add/Edit Member</h2>-->
+<!--    <form th:action="${#strings.contains(title, 'Add') ? '/members/add' : '/members/edit/' + member.id}" th:object="${member}" method="post">-->
+<!--&lt;!&ndash;    <h2 class="form-title">Create New Account</h2>&ndash;&gt;-->
+<!--&lt;!&ndash;    <form th:action="@{/register}" method="POST" th:object="${members}" enctype="multipart/form-data">&ndash;&gt;-->
+<!--      <form th:action="${#strings.contains(title, 'Add')?'/members/' }" method="POST" th:object="${members}" enctype="multipart/form-data">-->
+
+<!--      <div id="idGroup" class="form-group">-->
+<!--        <label for="name" class="label">Member ID</label>-->
+<!--        <input type="text" id="memberId" name="memberId" class="input" placeholder="Your Full Member Id" th:field="*{memberId}" required>-->
+<!--        <p id="idError" class="error-message"></p>-->
+<!--      </div>-->
+<!--      &lt;!&ndash;        <input type="text" id="memberId" name="memberId" th:field="*{memberId}"  >&ndash;&gt;-->
+
+<!--      <div id="nameGroup" class="form-group">-->
+<!--        <label for="name" class="label">Name</label>-->
+<!--        <input type="text" id="name" name="name" class="input" placeholder="Your Full Name" th:field="*{name}" required>-->
+<!--        <p id="nameError" class="error-message"></p>-->
+<!--      </div>-->
+<!--      <div id="emailGroup" class="form-group">-->
+<!--        <label for="email" class="label">Email Address</label>-->
+<!--        <input type="email" id="email" name="email" class="input" placeholder="Your Email" th:field="*{email}" required>-->
+<!--        <p id="emailError" class="error-message"></p>-->
+<!--      </div>-->
+<!--      <div id="passwordGroup" class="form-group">-->
+<!--        <label for="password" class="label">Password</label>-->
+<!--        <input type="password" id="password" name="password" class="input" placeholder="Create a Password" th:field="*{password}" required>-->
+<!--        <p id="passwordError" class="error-message"></p>-->
+<!--      </div>-->
+<!--      <div id="confirmPasswordGroup" class="form-group">-->
+<!--        <label for="confirmPassword" class="label">Confirm Password</label>-->
+<!--        <input type="password" id="confirmPassword" name="confirmPassword" class="input" placeholder="Confirm Your Password" th:field="*{confirmPassword}" required>-->
+<!--        <p id="confirmPasswordError" class="error-message"></p>-->
+<!--      </div>-->
+
+<!--      <div>-->
+<!--        <label for="fileImage" class="block text-sm/6 font-semibold text-gray-900">Image</label>-->
+<!--        <div class="mt-2.5">-->
+<!--          <input type="file" id="fileImage" name="image" accept="image/png, image/jpeg" class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">-->
+<!--          <p id="imageError" class="hidden text-red-600 text-sm mt-1">File size exceeds 1MB. Please upload a smaller file.</p>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--      <div>-->
+<!--        <img th:src="@{/{image}(image=${members.photosImagePath})}" id="thumbnail" class="h-24 w-auto border p-1 rounded-md" alt="Photo preview">-->
+<!--      </div>-->
+<!--      <button type="submit" class="button">Registration</button>-->
+<!--      <div class="link-container">-->
+<!--        Already have an account? <a href="/login" class="link">Log in</a>-->
+<!--      </div>-->
+<!--    </form>-->
+<!--  </div>-->
+<!--</div>-->
+
+<!--<script th:src="@{/authentication/registration.js}"></script>-->
+
+<!--&lt;!&ndash;<script>&ndash;&gt;-->
+<!--&lt;!&ndash;    $(document).ready(function() {&ndash;&gt;-->
+<!--&lt;!&ndash;        $('#fileImage').change(function () {&ndash;&gt;-->
+
+<!--&lt;!&ndash;            fileSize = this.files[0].size;&ndash;&gt;-->
+
+<!--&lt;!&ndash;            if(fileSize > 1048576) {&ndash;&gt;-->
+<!--&lt;!&ndash;                $('#imageError').removeClass("hidden")&ndash;&gt;-->
+<!--&lt;!&ndash;            } else {&ndash;&gt;-->
+<!--&lt;!&ndash;                $('#imageError').addClass("hidden")&ndash;&gt;-->
+<!--&lt;!&ndash;                showImageThumbnail(this);&ndash;&gt;-->
+<!--&lt;!&ndash;            }&ndash;&gt;-->
+<!--&lt;!&ndash;        });&ndash;&gt;-->
+<!--&lt;!&ndash;    });&ndash;&gt;-->
+
+<!--&lt;!&ndash;    function showImageThumbnail(fileInput) {&ndash;&gt;-->
+<!--&lt;!&ndash;        var file = fileInput.files[0];&ndash;&gt;-->
+<!--&lt;!&ndash;        var reader = new FileReader();&ndash;&gt;-->
+<!--&lt;!&ndash;        reader.onload = function (e) {&ndash;&gt;-->
+<!--&lt;!&ndash;            $('#thumbnail').attr("src", e.target.result);&ndash;&gt;-->
+<!--&lt;!&ndash;        };&ndash;&gt;-->
+<!--&lt;!&ndash;        reader.readAsDataURL(file);&ndash;&gt;-->
+
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+<!--&lt;!&ndash;</script>&ndash;&gt;-->
+<!--</body>-->
+<!--</html>-->
+
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${title}">Registration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="authentication/registration.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    /* ... (Your existing CSS here) ... */
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden; /* Prevent horizontal scrollbar */
+    }
+
+    .registration-container {
+      background-color: #ffffff;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      display: flex;
+      height: auto;
+      max-width: 800px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .registration-container:hover {
+      transform: translateY(-0.5rem);
+      box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.15), 0 3px 4px -1px rgba(0, 0, 0, 0.08);
+    }
+
+    .registration-image-side {
+      background-image: url('https://images.unsplash.com/photo-1544716278-ca5e3f165249?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80'); /* Replace with your image URL */
+      background-size: cover;
+      background-position: center;
+      width: 40%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #ffffff;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .registration-image-side:hover {
+      width: 45%;
+    }
+
+    .registration-image-overlay {
+      background-color: rgba(0, 0, 0, 0.5); /* Slightly darker overlay */
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .registration-image-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #f5f5f5;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    }
+
+    .registration-image-subtitle {
+      font-size: 1.2rem;
+      color: #e0e0e0;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+
+    .registration-form-side {
+      padding: 2.5rem;
+      width: 60%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+
+    .form-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 2rem;
+      text-align: left;
+      border-bottom: 2px solid #ecf0f1;
+      padding-bottom: 1rem;
+    }
+
+    .form-title:hover {
+      border-bottom-color: #3498db;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .label {
+      display: block;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #34495e;
+      margin-bottom: 0.75rem;
+    }
+
+    .label:hover {
+      color: #2c3e50;
+    }
+
+    .input {
+      width: 100%;
+      padding: 0.8rem;
+      border-radius: 0.5rem;
+      border: 1px solid #bdc3c7;
+      font-size: 1rem;
+      color: #2c3e50;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      background-color: #f9f9f9;
+    }
+
+    .input:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+    }
+
+    .input:hover {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .error-message {
+      color: #e74c3c;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      opacity: 0;
+    }
+
+    .form-group.error .error-message {
+      opacity: 1;
+    }
+
+    .button {
+      width: 100%;
+      padding: 0.8rem;
+      border-radius: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #ffffff;
+      background-color: #3498db;
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .button:hover {
+      background-color: #2980b9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .button:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .button::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 5px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 100%;
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
+      transition: transform 0.5s ease, opacity 0.5s ease;
+    }
+
+    .button:active::after {
+      transform: translate(-50%, -50%) scale(100);
+      opacity: 1;
+    }
+
+    .link-container {
+      margin-top: 1.5rem;
+      font-size: 1rem;
+      color: #555555;
+      text-align: center;
+      opacity: 1;
+    }
+
+
+    .link {
+      color: #3498db;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s ease, text-decoration 0.2s ease;
+    }
+
+    .link:hover {
+      color: #2980b9;
+      text-decoration: underline;
+    }
+
+    /* Responsive adjustments for smaller screens */
+    @media (max-width: 768px) {
+      .registration-container {
+        flex-direction: column;
+        width: 95%;
+        margin: 1rem auto;
+        overflow-y: auto;
+        max-height: 100vh;
+      }
+      .registration-image-side {
+        width: 100%;
+        height: auto;
+        max-height: 300px;
+      }
+      .registration-form-side {
+        width: 100%;
+        padding: 2rem;
+      }
+      .registration-image-overlay {
+        padding: 1rem;
+      }
+      .registration-image-title {
+        font-size: 1.8rem;
+      }
+      .registration-image-subtitle {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="registration-container">
+  <div class="registration-image-side">
+    <div class="registration-image-overlay">
+      <h2 class="registration-image-title">Join Our Hub Community</h2>
+      <p class="registration-image-subtitle">Discover a world of knowledge and stories.</p>
+    </div>
+  </div>
+  <div class="registration-form-side">
+    <h2 class="form-title" th:text="${title}">Add/Edit Member</h2>
+
+    <form th:action="${#strings.contains(title, 'Edit') ? '/member/' + members.id + '/edit' : '/register'}"
+          method="POST"
+          th:object="${members}"
+          enctype="multipart/form-data">
+
+      <input type="hidden" th:field="*{id}" th:if="${members.id != null}" />
+
+      <div id="idGroup" class="form-group">
+        <label for="memberId" class="label">Member ID</label>
+        <input type="text" id="memberId" name="memberId" class="input" placeholder="Your Full Member Id" th:field="*{memberId}" required>
+        <p id="idError" class="error-message"></p>
+      </div>
+
+      <div id="nameGroup" class="form-group">
+        <label for="name" class="label">Name</label>
+        <input type="text" id="name" name="name" class="input" placeholder="Your Full Name" th:field="*{name}" required>
+        <p id="nameError" class="error-message"></p>
+      </div>
+      <div id="emailGroup" class="form-group">
+        <label for="email" class="label">Email Address</label>
+        <input type="email" id="email" name="email" class="input" placeholder="Your Email" th:field="*{email}" required>
+        <p id="emailError" class="error-message"></p>
+      </div>
+
+      <div id="passwordGroup" class="form-group" th:classappend="${#strings.contains(title, 'Edit') ? 'hidden' : ''}">
+        <label for="password" class="label">Password</label>
+        <input type="password" id="password" name="password" class="input" placeholder="Create a Password" th:field="*{password}" th:required="${!#strings.contains(title, 'Edit')}">
+        <p id="passwordError" class="error-message"></p>
+      </div>
+      <div id="confirmPasswordGroup" class="form-group" th:classappend="${#strings.contains(title, 'Edit') ? 'hidden' : ''}">
+        <label for="confirmPassword" class="label">Confirm Password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" class="input" placeholder="Confirm Your Password" th:field="*{confirmPassword}" th:required="${!#strings.contains(title, 'Edit')}">
+        <p id="confirmPasswordError" class="error-message"></p>
+      </div>
+
+      <div>
+        <label for="fileImage" class="block text-sm/6 font-semibold text-gray-900">Image</label>
+        <div class="mt-2.5">
+          <input type="file" id="fileImage" name="image" accept="image/png, image/jpeg" class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+          <p id="imageError" class="hidden text-red-600 text-sm mt-1">File size exceeds 1MB. Please upload a smaller file.</p>
+        </div>
+      </div>
+      <div>
+        <img th:src="@{/{image}(image=${members.photosImagePath})}" id="thumbnail" class="h-24 w-auto border p-1 rounded-md" alt="Photo preview">
+      </div>
+
+      <button type="submit" class="button" th:text="${#strings.contains(title, 'Edit') ? 'Update Member' : 'Registration'}">Registration</button>
+
+      <div class="link-container" th:if="${#strings.contains(title, 'Create')}">
+        Already have an account? <a href="/login" class="link">Log in</a>
+      </div>
+      <div class="link-container" th:if="${#strings.contains(title, 'Edit')}">
+        <a href="/member-list" class="link">Back to Member List</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script th:src="@{/authentication/registration.js}"></script>
+
+</body>
+</html>
