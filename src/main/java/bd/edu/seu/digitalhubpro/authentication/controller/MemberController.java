@@ -26,7 +26,7 @@ public class MemberController {
     }
 
     @GetMapping({"/member-list"})
-    public String home(@RequestParam(value = "name",defaultValue = "") String name, Model model) {
+    public String home(@RequestParam(value = "name", defaultValue = "") String name, Model model) {
         List<Member> memberList = this.memberService.getAllMembers();
         model.addAttribute("memberList", memberList);
         return "authentication/memberList";
@@ -48,7 +48,7 @@ public class MemberController {
             if (!multipartFile.isEmpty()) {
                 String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
                 member.setPhoto(fileName);
-                member.setRoles(new ArrayList());
+                member.setRoles(new ArrayList<>());
                 member.getRoles().add("ROLE_STUDENT");
                 Member savedMember = this.memberService.save(member);
                 String uploadDir = "member-photos/" + savedMember.getId();
@@ -56,7 +56,9 @@ public class MemberController {
             }
 
             redirectAttributes.addFlashAttribute("message", "Customer saved successfully");
-            return "redirect:/member-list";
+
+            // ✅ THIK KORA HOLO: Pura member list-e na pathiye login page-e redirect hobe
+            return "redirect:/login?register=true";
         }
     }
 
@@ -71,7 +73,7 @@ public class MemberController {
     public String edit(@PathVariable String id, Model model) {
         Optional<Member> memberOptional = this.memberService.findById(id);
         if (memberOptional.isPresent()) {
-            Member member = (Member)memberOptional.get();
+            Member member = (Member) memberOptional.get();
             model.addAttribute("members", member);
             model.addAttribute("title", "Edit Member");
             return "authentication/addMember";
@@ -101,8 +103,4 @@ public class MemberController {
         redirectAttributes.addFlashAttribute("message", "Customer deleted successfully");
         return "redirect:/member-list";
     }
-
 }
-
-
-//Tor

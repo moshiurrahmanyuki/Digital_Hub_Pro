@@ -1,6 +1,5 @@
 package bd.edu.seu.digitalhubpro.configuration;
 
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,16 +12,19 @@ import java.io.IOException;
 
 @Component
 public class MemberLoginSuccessHandler implements AuthenticationSuccessHandler {
+
     public MemberLoginSuccessHandler() {
     }
 
+    @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         System.out.println("Inside onAuthenticationSuccess ");
-        MemberUserDetails userDetails = (MemberUserDetails)authentication.getPrincipal();
+        MemberUserDetails userDetails = (MemberUserDetails) authentication.getPrincipal();
         HttpSession session = request.getSession();
         session.setAttribute("name", userDetails.getName());
         session.setAttribute("email", userDetails.getUsername());
         session.setAttribute("loggedInUser", userDetails);
+
         response.sendRedirect(request.getContextPath() + "/home");
     }
 }

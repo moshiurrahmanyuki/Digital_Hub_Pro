@@ -18,8 +18,8 @@
         <button class="nav-button menu-button">
           <i class="uil uil-bars"></i>
         </button>
-        <a href="user/Images/Sharif-Logo.jpg" class="nav-logo">
-          <img src="user/Images/Sharif-Logo.jpg" alt="Logo" class="logo-image">
+        <a href="user/Images/hublogo.png" class="nav-logo">
+          <img src="user/Images/hublogo.png" alt="Logo" class="logo-image">
           <h2 class="logo-text">DigitalHub</h2>
         </a>
       </div>
@@ -50,7 +50,7 @@
         <img th:if="${loggedInUser != null}" th:src="${loggedInUser.photosImagePath != null ? loggedInUser.photosImagePath : 'user/Images/user.jpg'}" alt="User Image" class="user-image" onclick="toggleMenu()">
 
         <!--                   <img th:src="${loggedInUser.photosImagePath != null ? loggedInUser.photosImagePath : 'user/Images/user.jpg'}" alt="User Image" class="user-image" onclick="toggleMenu()">-->
-        <img th:unless="${loggedInUser != null}" src="user/Images/user.jpg" alt="User Image" class="user-image" onclick="toggleMenu()">
+        <img th:unless="${loggedInUser != null}" src="user/Images/hublogo.png" alt="User Image" class="user-image" onclick="toggleMenu()">
 
         <div class="sub-menu-wrap" id="subMenu" th:if="${loggedInUser != null}">
           <div class="sub-menu">
